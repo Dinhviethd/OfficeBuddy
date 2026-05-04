@@ -17,9 +17,9 @@ export class UserRepository {
   }
 
   // Tìm user theo ID
-  async findById(idUser: string): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     return this.repository.findOne({
-      where: { idUser },
+      where: { id },
     });
   }
 
@@ -30,14 +30,14 @@ export class UserRepository {
   }
 
   // Cập nhật user
-  async update(idUser: string, updateData: UpdateProfileInput): Promise<User | null> {
-    await this.repository.update(idUser, updateData);
-    return this.findById(idUser);
+  async update(id: string, updateData: UpdateProfileInput): Promise<User | null> {
+    await this.repository.update(id, updateData);
+    return this.findById(id);
   }
 
   // Xóa user
-  async delete(idUser: string): Promise<boolean> {
-    const result = await this.repository.delete(idUser);
+  async delete(id: string): Promise<boolean> {
+    const result = await this.repository.delete(id);
     return result.affected !== 0;
   }
 

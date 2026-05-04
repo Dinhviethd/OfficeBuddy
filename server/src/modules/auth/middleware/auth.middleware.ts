@@ -63,8 +63,7 @@ export const checkAccountStatus = async (
 
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
-      where: { idUser: userId },
-      select: ['emailVerified']
+      where: { id: userId },
     });
 
     if (!user) throw new AppError(404, "User not found");

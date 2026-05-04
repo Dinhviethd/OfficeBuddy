@@ -1,23 +1,14 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserRepository, userRepository } from '@/modules/auth/repositories/user.repository';
 import {
   RegisterInput,
   LoginInput,
-  SendOTPInput,
-  ResetPasswordInput,
-  VerifyOTPInput,
   UpdateCurrentProfileInput,
-  ChangePasswordInput,
-  PresetAvatarUrl,
   AuthResponse,
   UserResponse,
-  PRESET_AVATAR_URLS,
 } from '@/modules/auth/schemas/auth.schema';
 import { AppError } from '@/utils/error.response';
 import { User } from "@/modules/auth/entities/user.model";
-import { generateOTP, sendOTPEmail } from '@/utils/email';
-import { uploadBufferToCloudinary } from '@/utils/upload';
 
 
 export class AuthService {
@@ -29,7 +20,7 @@ export class AuthService {
 
   
   async register(input: RegisterInput): Promise<AuthResponse> {
-    const { name, email, password, phone } = input;
+    const { fullName, email } = input;
 
     
     const existingUser = await this.userRepo.findByEmail(email);
@@ -38,23 +29,13 @@ export class AuthService {
     }
 
     
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const randomAvatarUrl =
-      PRESET_AVATAR_URLS[Math.floor(Math.random() * PRESET_AVATAR_URLS.length)];
-
-    
     const newUser = await this.userRepo.create({
-      name,
+      fullName,
       email,
-      password: hashedPassword,
-      phone,
-      emailVerified: false,
-      avatarUrl: randomAvatarUrl,
     });
 
     
-    const tokens = this.generateTokens(newUser.idUser);
+    const tokens = this.generateTokens(newUser.id);
 
     return {
       user: this.toUserResponse(newUser),
@@ -64,7 +45,7 @@ export class AuthService {
 
   
   async login(input: LoginInput): Promise<AuthResponse> {
-    const { email, password } = input;
+    const { email } = input;
 
     
     const user = await this.userRepo.findByEmail(email);
@@ -73,13 +54,7 @@ export class AuthService {
     }
 
     
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new AppError(401, 'Email hoặc mật khẩu không chính xác');
-    }
-
-    
-    const tokens = this.generateTokens(user.idUser);
+    const tokens = this.generateTokens(user.id);
 
     return {
       user: this.toUserResponse(user),
@@ -104,7 +79,7 @@ export class AuthService {
       }
 
       
-      return this.generateTokens(user.idUser);
+      return this.generateTokens(user.id);
     } catch (error: any) {
       if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
         throw new AppError(401, 'Refresh token không hợp lệ hoặc đã hết hạn');
@@ -136,153 +111,8 @@ export class AuthService {
     return this.toUserResponse(updatedUser);
   }
 
-  async changePassword(userId: string, input: ChangePasswordInput): Promise<void> {
-    const user = await this.userRepo.findById(userId);
-    if (!user) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    const isPasswordValid = await bcrypt.compare(input.currentPassword, user.password);
-    if (!isPasswordValid) {
-      throw new AppError(400, 'Mật khẩu hiện tại không chính xác');
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(input.newPassword, salt);
-
-    await this.userRepo.update(userId, {
-      password: hashedPassword,
-    });
-  }
-
-  async uploadAvatar(userId: string, fileBuffer: Buffer): Promise<UserResponse> {
-    const user = await this.userRepo.findById(userId);
-    if (!user) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    const uploadResult = await uploadBufferToCloudinary(fileBuffer, {
-      folder: 'honsuviet/avatars',
-      publicId: `${userId}-${Date.now()}`,
-    });
-
-    const updatedUser = await this.userRepo.update(userId, {
-      avatarUrl: uploadResult.secure_url,
-    });
-
-    if (!updatedUser) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    return this.toUserResponse(updatedUser);
-  }
-
-  async updatePresetAvatar(userId: string, avatarUrl: PresetAvatarUrl): Promise<UserResponse> {
-    const user = await this.userRepo.findById(userId);
-    if (!user) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    const updatedUser = await this.userRepo.update(userId, {
-      avatarUrl,
-    });
-
-    if (!updatedUser) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    return this.toUserResponse(updatedUser);
-  }
-
   async logout(userId: string): Promise<void> {
     // Có thể thêm logic để invalidate token ở đây
-  }
-
-  async forgotPassword(input: SendOTPInput): Promise<void> {
-    const { email } = input;
-    const user = await this.userRepo.findByEmail(email);
-    if (!user) {
-      throw new AppError(404, 'Email không tồn tại trong hệ thống');
-    }
-
-    
-    const otp = generateOTP();
-    
-    
-    const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-    
-    await this.userRepo.update(user.idUser, {
-      resetOTP: otp,
-      resetOTPExpires: otpExpires,
-    });
-
-    
-    await sendOTPEmail(email, otp);
-  }
-
-  
-  async verifyOTP(input: VerifyOTPInput): Promise<{ valid: boolean }> {
-    const { email, otp } = input;
-
-    
-    const user = await this.userRepo.findByEmail(email);
-    if (!user) {
-      throw new AppError(404, 'Email không tồn tại trong hệ thống');
-    }
-
-    
-    if (!user.resetOTP || !user.resetOTPExpires) {
-      throw new AppError(400, 'Bạn chưa yêu cầu đặt lại mật khẩu');
-    }
-
-    
-    if (new Date() > user.resetOTPExpires) {
-      throw new AppError(400, 'Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới');
-    }
-
-    
-    if (user.resetOTP !== otp) {
-      throw new AppError(400, 'Mã OTP không chính xác');
-    }
-
-    return { valid: true };
-  }
-
-  
-  async resetPassword(input: ResetPasswordInput): Promise<void> {
-    const { email, otp, newPassword } = input;
-
-    
-    const user = await this.userRepo.findByEmail(email);
-    if (!user) {
-      throw new AppError(404, 'Email không tồn tại trong hệ thống');
-    }
-
-    
-    if (!user.resetOTP || !user.resetOTPExpires) {
-      throw new AppError(400, 'Bạn chưa yêu cầu đặt lại mật khẩu');
-    }
-
-    
-    if (new Date() > user.resetOTPExpires) {
-      throw new AppError(400, 'Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới');
-    }
-
-    
-    if (user.resetOTP !== otp) {
-      throw new AppError(400, 'Mã OTP không chính xác');
-    }
-
-    
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    
-    await this.userRepo.update(user.idUser, {
-      password: hashedPassword,
-      resetOTP: undefined,
-      resetOTPExpires: undefined,
-    });
   }
 
   
@@ -315,12 +145,10 @@ export class AuthService {
   
   private toUserResponse(user: User): UserResponse {
     return {
-      idUser: user.idUser,
-      name: user.name,
+      id: user.id,
+      fullName: user.fullName,
       email: user.email,
-      emailVerified: user.emailVerified,
-      avatarUrl: user.avatarUrl,
-      phone: user.phone,
+      role: user.role,
       createdAt: user.createdAt,
     };
   }
