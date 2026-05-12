@@ -14,12 +14,13 @@ dotenv.config()
 const app = express()
 const server = createServer(app)
 
-const clientBuildPath = path.resolve('/app/public');
-app.use(express.static(clientBuildPath));
+// Static files serving (if needed for deployment)
+// const clientBuildPath = path.resolve('/app/public');
+// app.use(express.static(clientBuildPath));
 
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser()); 
+app.use(cookieParser());
 
 app.use(cors({
     origin: process.env.CLIENT_URL || "*",
@@ -28,22 +29,30 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
-initDatabase().catch(err => {
-    console.error("WRONG PASSWORD: Cannot connect to Database!");
-    console.error(err);
-    process.exit(1);
-});
+// TODO: Configure DATABASE_URL in .env to enable database connection
+// initDatabase().catch(err => {
+//     console.error("WRONG PASSWORD: Cannot connect to Database!");
+//     console.error(err);
+//     process.exit(1);
+// });
 
 app.use("/api", router)
 
+app.get("/", (req, res) => {
+    res.json({ 
+        success: true, 
+        message: "eOffice API Server is running",
+        timestamp: new Date()
+    })
+})
 
 app.use(errorHandler.notFound)
 app.use(errorHandler.errorHandler)
 
 //for deploy client build
-app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-});
+// app.get(/(.*)/, (req, res) => {
+//     res.sendFile(path.join(clientBuildPath, 'index.html'));
+// });
 
 const PORT = process.env.PORT || 8000
 

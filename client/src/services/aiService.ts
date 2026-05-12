@@ -1,15 +1,15 @@
-export type MessageRole = "user" | "assistant";
-
 export interface Message {
   id: string;
-  role: MessageRole;
+  role: "user" | "assistant";
   content: string;
   createdAt: Date;
 }
 
-export const sendMessage = async (messages: Message[]): Promise<string> => {
+const API_BASE_URL = "/api";
+
+export async function sendMessage(messages: Message[]): Promise<string> {
   try {
-    const response = await fetch("/api/ai/chat", {
+    const response = await fetch(`${API_BASE_URL}/ai/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,4 +33,4 @@ export const sendMessage = async (messages: Message[]): Promise<string> => {
     console.error("AI Service Error:", error);
     throw error;
   }
-};
+}
