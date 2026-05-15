@@ -41,7 +41,7 @@ export class AIService {
       // If no mock match, try real API
       try {
         const model = genAI.getGenerativeModel({ 
-          model: "gemini-1.5-flash",
+          model: "gemini-2.5-flash-lite",
           systemInstruction: "You are a helpful assistant for an eOffice application. You help users create documents, forms, and manage office tasks. Respond in the user's language (Vietnamese if needed). Be concise and professional.",
         });
 
