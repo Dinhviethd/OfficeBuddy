@@ -29,31 +29,26 @@ export class AuthService {
 
   
   async register(input: RegisterInput): Promise<AuthResponse> {
-    const { name, email, password, phone } = input;
+    const { username, password } = input;
 
-    
-    const existingUser = await this.userRepo.findByEmail(email);
+    const existingUser = await this.userRepo.findByUsername(username);
     if (existingUser) {
-      throw new AppError(400, 'Email đã được sử dụng');
+      throw new AppError(400, 'Tên tài khoản đã được sử dụng');
     }
 
-    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const randomAvatarUrl =
       PRESET_AVATAR_URLS[Math.floor(Math.random() * PRESET_AVATAR_URLS.length)];
 
-    
     const newUser = await this.userRepo.create({
-      name,
-      email,
+      name: username, // Use username as the default name
+      username,
       password: hashedPassword,
-      phone,
       emailVerified: false,
       avatarUrl: randomAvatarUrl,
     });
 
-    
     const tokens = this.generateTokens(newUser.idUser);
 
     return {
@@ -62,23 +57,19 @@ export class AuthService {
     };
   }
 
-  
   async login(input: LoginInput): Promise<AuthResponse> {
-    const { email, password } = input;
+    const { username, password } = input;
 
-    
-    const user = await this.userRepo.findByEmail(email);
+    const user = await this.userRepo.findByUsername(username);
     if (!user) {
-      throw new AppError(401, 'Email hoặc mật khẩu không chính xác');
+      throw new AppError(401, 'Tên tài khoản hoặc mật khẩu không chính xác');
     }
 
-    
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new AppError(401, 'Email hoặc mật khẩu không chính xác');
+      throw new AppError(401, 'Tên tài khoản hoặc mật khẩu không chính xác');
     }
 
-    
     const tokens = this.generateTokens(user.idUser);
 
     return {
@@ -317,6 +308,7 @@ export class AuthService {
     return {
       idUser: user.idUser,
       name: user.name,
+      username: user.username,
       email: user.email,
       emailVerified: user.emailVerified,
       avatarUrl: user.avatarUrl,

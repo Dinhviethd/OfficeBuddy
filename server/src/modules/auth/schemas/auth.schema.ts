@@ -16,32 +16,25 @@ export const PRESET_AVATAR_URLS = [
 ] as const;
 
 export const registerSchema = z.object({
-  name: z
+  username: z
     .string()
-    .min(2, 'Tên phải có ít nhất 2 ký tự')
-    .max(100, 'Tên không được vượt quá 100 ký tự'),
-  email: z
-    .string()
-    .email('Email không hợp lệ'),
+    .min(3, 'Tên tài khoản phải có ít nhất 3 ký tự')
+    .max(50, 'Tên tài khoản không được vượt quá 50 ký tự')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Tên tài khoản chỉ chứa chữ, số và dấu gạch dưới'),
   password: z
     .string()
     .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
-    .max(50, 'Mật khẩu không được vượt quá 50 ký tự')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường và 1 số'
-    ),
+    .max(50, 'Mật khẩu không được vượt quá 50 ký tự'),
   confirmPassword: z.string(),
-  phone: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Mật khẩu xác nhận không khớp',
   path: ['confirmPassword'],
 });
 
 export const loginSchema = z.object({
-  email: z
+  username: z
     .string()
-    .email('Email không hợp lệ'),
+    .min(1, 'Vui lòng nhập tên tài khoản'),
   password: z
     .string()
     .min(1, 'Vui lòng nhập mật khẩu'),
@@ -91,7 +84,8 @@ export const resetPasswordSchema = z.object({
 
 export const createUserSchema = z.object({
   name: z.string().min(2).max(100),
-  email: z.string().email(),
+  username: z.string().min(3).max(50),
+  email: z.string().email().optional(),
   password: z.string().min(6).max(255),
   emailVerified: z.boolean().optional(),
   avatarUrl: z.string().optional(),
@@ -150,7 +144,8 @@ export type PresetAvatarUrl = (typeof PRESET_AVATAR_URLS)[number];
 export type UserResponse = {
   idUser: string;
   name: string;
-  email: string;
+  username: string;
+  email?: string;
   emailVerified: boolean;
   avatarUrl?: string;
   phone?: string;

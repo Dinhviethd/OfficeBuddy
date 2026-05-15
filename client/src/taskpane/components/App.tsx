@@ -1,5 +1,7 @@
 import * as React from "react";
 import { sendMessage, type Message } from "../services/aiService";
+import { AuthService } from "../services/authService";
+import Login from "./Login";
 
 interface AppProps {
   title: string;
@@ -13,7 +15,20 @@ const quickActions = [
   "Đề nghị thanh toán",
 ];
 
+interface User {
+  idUser: string;
+  name: string;
+  username: string;
+  email?: string;
+  phone?: string;
+  avatarUrl?: string;
+}
+
 const App: React.FC<AppProps> = () => {
+  console.log("App component rendering");
+  
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [user, setUser] = React.useState<User | null>(null);
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: "welcome",
@@ -27,6 +42,40 @@ const App: React.FC<AppProps> = () => {
   const chatEndRef = React.useRef<HTMLDivElement | null>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
+  // Check if user is already logged in on mount
+  React.useEffect(() => {
+    console.log("App useEffect: checking authentication");
+    try {
+      console.log("Checking for existing authentication...");
+      const token = AuthService.getAccessToken();
+      console.log("Access token exists:", !!token);
+      
+      if (!token) {
+        console.log("No token found, user will see login");
+        return;
+      }
+
+      console.log("Token found, attempting to restore user data");
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          console.log("Parsing user data from localStorage");
+          const userData = JSON.parse(userStr);
+          console.log("User data parsed successfully:", userData.username);
+          setUser(userData);
+          setIsAuthenticated(true);
+          console.log("User authentication restored");
+        } catch (parseErr) {
+          console.error("Failed to parse user data:", parseErr);
+          AuthService.clearTokens();
+          localStorage.removeItem("user");
+        }
+      }
+    } catch (err) {
+      console.error("Unexpected error in auth check:", err);
+    }
+  }, []);
+
   React.useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
@@ -38,6 +87,37 @@ const App: React.FC<AppProps> = () => {
     textareaRef.current.style.height = "0px";
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   }, [input]);
+
+  const handleLoginSuccess = (userData: User) => {
+    console.log("handleLoginSuccess called with:", userData);
+    try {
+      localStorage.setItem("user", JSON.stringify(userData));
+      console.log("User data saved to localStorage");
+      setUser(userData);
+      console.log("User state updated");
+      setIsAuthenticated(true);
+      console.log("Authentication state set to true");
+    } catch (err) {
+      console.error("Error saving user data:", err);
+      alert("Đã xảy ra lỗi khi lưu dữ liệu. Vui lòng thử lại.");
+    }
+  };
+
+  const handleLogout = () => {
+    try {
+      AuthService.clearTokens();
+      localStorage.removeItem("user");
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (err) {
+      console.error("Error during logout:", err);
+    }
+  };
+
+  // Show login if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
 
   const handleSend = async () => {
     const trimmed = input.trim();
@@ -323,9 +403,23 @@ const App: React.FC<AppProps> = () => {
             <div className="brand-subtitle">Trợ lý eOffice cho văn bản hành chính</div>
           </div>
         </div>
-        <div className="status">
-          <span className="status-dot" />
-          <span>Đang hoạt động</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {user && <span style={{ fontSize: "12px", color: "#66747f" }}>{user.name}</span>}
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "#c50f1f",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              padding: "6px 12px",
+              fontSize: "12px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Đăng xuất
+          </button>
         </div>
       </header>
 

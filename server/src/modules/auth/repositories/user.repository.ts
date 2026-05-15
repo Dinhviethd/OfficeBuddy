@@ -16,6 +16,13 @@ export class UserRepository {
     });
   }
 
+  // Tìm user theo username
+  async findByUsername(username: string): Promise<User | null> {
+    return this.repository.findOne({
+      where: { username },
+    });
+  }
+
   // Tìm user theo ID
   async findById(idUser: string): Promise<User | null> {
     return this.repository.findOne({
