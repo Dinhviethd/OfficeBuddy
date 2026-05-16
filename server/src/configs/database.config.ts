@@ -1,20 +1,20 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
+import path from "path";
 dotenv.config();
+
+// Use SQLite for local development
 export const AppDataSource = new DataSource({
-  type: "postgres",
-
-  url: process.env.DATABASE_URL, 
-
-  ssl: { rejectUnauthorized: false },
-
+  type: "sqlite",
+  database: path.resolve(__dirname, "../../data/database.sqlite"),
+  synchronize: true,
+  logging: false,
   entities: [
     __dirname + "/../modules/**/*.entity.{ts,js}",
     __dirname + "/../modules/**/*.model.{ts,js}",
   ],
   migrations: [__dirname + "/../migrations/*.{ts,js}"],
-  synchronize: false,
 });
 
 

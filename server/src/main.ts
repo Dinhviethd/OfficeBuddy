@@ -29,9 +29,11 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
-// TODO: Configure DATABASE_URL in .env to enable database connection
+// TODO: Database initialization disabled for now
+// To enable: Install SQLite3 (npm install sqlite3) or configure PostgreSQL connection
+// See database.config.ts for configuration
 // initDatabase().catch(err => {
-//     console.error("WRONG PASSWORD: Cannot connect to Database!");
+//     console.error("Failed to connect to database!");
 //     console.error(err);
 //     process.exit(1);
 // });
