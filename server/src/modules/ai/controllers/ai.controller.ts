@@ -4,7 +4,12 @@ import { aiService, type ChatMessage } from "../services/ai.service";
 export class AIController {
   async chat(req: Request, res: Response, next: NextFunction) {
     try {
-      const { messages } = req.body;
+      const { messages, documentContext } = req.body;
+      console.log("AI Chat request received:", {
+        messagesCount: messages?.length,
+        hasDocumentContext: !!documentContext,
+        documentContextLength: documentContext?.length,
+      });
 
       if (!messages || !Array.isArray(messages)) {
         return res.status(400).json({
@@ -20,7 +25,8 @@ export class AIController {
         })
       );
 
-      const reply = await aiService.chat(chatMessages);
+      console.log("Calling aiService.chat with documentContext:", !!documentContext);
+      const reply = await aiService.chat(chatMessages, documentContext);
 
       res.json({
         success: true,

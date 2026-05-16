@@ -1,3 +1,6 @@
+// API configuration - point to backend server
+const API_BASE_URL = 'http://localhost:8000/api';
+
 export type MessageRole = "user" | "assistant";
 
 export interface Message {
@@ -7,20 +10,44 @@ export interface Message {
   createdAt: Date;
 }
 
-export const sendMessage = async (messages: Message[]): Promise<string> => {
+export interface ChatRequest {
+  messages: Array<{ role: MessageRole; content: string }>;
+  documentContext?: string; // Optional document content for context
+}
+
+export const sendMessage = async (messages: Message[], documentContext?: string): Promise<string> => {
   try {
-    const response = await fetch("/api/ai/chat", {
+    console.log("sendMessage called with:", {
+      messagesCount: messages.length,
+      hasDocumentContext: !!documentContext,
+      documentContextLength: documentContext?.length,
+      documentContextPreview: documentContext?.substring(0, 50),
+    });
+
+    const request: ChatRequest = {
+      messages: messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
+    };
+
+    // Add document context if provided
+    if (documentContext) {
+      console.log("Adding documentContext to request");
+      request.documentContext = documentContext;
+    }
+
+    console.log("Sending request to:", `${API_BASE_URL}/ai/chat`, "with body:", request);
+
+    const response = await fetch(`${API_BASE_URL}/ai/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        messages: messages.map((msg) => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-      }),
+      body: JSON.stringify(request),
     });
+
+    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const error = await response.json();

@@ -18,8 +18,15 @@ const mockResponses: { [key: string]: string } = {
 };
 
 export class AIService {
-  async chat(messages: ChatMessage[]): Promise<string> {
+  async chat(messages: ChatMessage[], documentContext?: string): Promise<string> {
     try {
+      console.log("AIService.chat called with:", {
+        messagesCount: messages.length,
+        hasDocumentContext: !!documentContext,
+        documentContextLength: documentContext?.length,
+        documentContextPreview: documentContext?.substring(0, 100),
+      });
+
       // Find first user message index (skip welcome assistant message)
       const firstUserIndex = messages.findIndex((msg) => msg.role === "user");
       
@@ -31,18 +38,37 @@ export class AIService {
       const lastMessage = conversationMessages[conversationMessages.length - 1];
       const userInput = lastMessage.content.toLowerCase();
 
-      // Check if we have a mock response for this input
-      for (const [key, response] of Object.entries(mockResponses)) {
-        if (userInput.includes(key)) {
-          return response;
+      // Only use mock responses if NO document context is provided
+      // If document context is provided, always use real API for accurate document-based responses
+      if (!documentContext) {
+        console.log("No documentContext - checking mock responses");
+        // Check if we have a mock response for this input
+        for (const [key, response] of Object.entries(mockResponses)) {
+          if (userInput.includes(key)) {
+            console.log("Matched mock response for key:", key);
+            return response;
+          }
         }
+      } else {
+        console.log("documentContext provided - skipping mock responses, using real API");
       }
 
-      // If no mock match, try real API
+      // If no mock match (or documentContext provided), try real API
       try {
+        // Prepare system instruction with document context if provided
+        let systemInstruction = "You are a helpful assistant for an eOffice application. You help users create documents, forms, and manage office tasks. Respond in the user's language (Vietnamese if needed). Be concise and professional.";
+        
+        if (documentContext) {
+          console.log("Adding documentContext to system instruction, length:", documentContext.length);
+          systemInstruction += `\n\nBạn có quyền truy cập vào nội dung tài liệu Word hiện tại. Dưới đây là nội dung:\n\n${documentContext}\n\nHãy sử dụng thông tin này để giúp người dùng tốt hơn. Nếu câu hỏi liên quan đến tài liệu, hãy trích dẫn nội dung liên quan.`;
+          console.log("System instruction updated with document context, total length:", systemInstruction.length);
+        } else {
+          console.log("No documentContext provided");
+        }
+
         const model = genAI.getGenerativeModel({ 
           model: "gemini-2.5-flash-lite",
-          systemInstruction: "You are a helpful assistant for an eOffice application. You help users create documents, forms, and manage office tasks. Respond in the user's language (Vietnamese if needed). Be concise and professional.",
+          systemInstruction: systemInstruction,
         });
 
         // Build history (all but last message)
@@ -52,6 +78,8 @@ export class AIService {
             role: msg.role === "user" ? "user" : "model",
             parts: [{ text: msg.content }],
           }));
+
+        console.log("Calling Gemini API with:", { historyLength: history.length, userMessage: lastMessage.content, systemInstructionLength: systemInstruction.length });
 
         const chat = model.startChat({
           history: history.length > 0 ? history : undefined,
@@ -64,6 +92,7 @@ export class AIService {
         const response = result.response;
         const text = response.text();
 
+        console.log("Got response from Gemini API:", text.substring(0, 100));
         return text;
       } catch (apiError) {
         console.error("Google API failed, using mock response:", apiError);
