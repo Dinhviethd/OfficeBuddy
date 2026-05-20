@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { retriever } from "@/modules/ai/retriever";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
 
@@ -18,7 +19,7 @@ const mockResponses: { [key: string]: string } = {
 };
 
 export class AIService {
-  async chat(messages: ChatMessage[], documentContext?: string): Promise<string> {
+  async chat(messages: ChatMessage[], documentContext?: string, useRAG?: boolean): Promise<string> {
     try {
       console.log("AIService.chat called with:", {
         messagesCount: messages.length,
@@ -37,6 +38,22 @@ export class AIService {
 
       const lastMessage = conversationMessages[conversationMessages.length - 1];
       const userInput = lastMessage.content.toLowerCase();
+
+      // If RAG requested and no explicit documentContext provided, try retrieval
+      if (useRAG && !documentContext) {
+        try {
+          console.log("RAG enabled - retrieving relevant docs for query");
+          const retrieved = await retriever.getRelevantDocs(lastMessage.content, 3);
+          if (retrieved && retrieved.length > 0) {
+            documentContext = retrieved;
+            console.log("Retrieved documentContext length", documentContext.length);
+          } else {
+            console.log("No relevant docs found by retriever");
+          }
+        } catch (rErr) {
+          console.error("Retriever error:", rErr);
+        }
+      }
 
       // Only use mock responses if NO document context is provided
       // If document context is provided, always use real API for accurate document-based responses

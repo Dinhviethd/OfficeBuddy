@@ -207,7 +207,7 @@ const App: React.FC<AppProps> = () => {
         contextLength: context?.length,
       });
 
-      const reply = await sendMessage(nextMessages, context);
+      const reply = await sendMessage(nextMessages, context, true);
       const aiMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",

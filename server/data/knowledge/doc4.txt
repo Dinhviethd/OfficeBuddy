@@ -1,0 +1,11 @@
+Mẫu thông báo
+
+Tiêu đề: THÔNG BÁO VỀ [NỘI DUNG]
+
+Kính gửi: [Đơn vị/Người nhận]
+
+Nội dung: Trình bày ngắn gọn sự việc, yêu cầu, thời gian và địa điểm (nếu có). Nêu rõ người chịu trách nhiệm và hướng dẫn thực hiện.
+
+Thời hạn thực hiện: [dd/mm/yyyy]
+
+Người lập thông báo: [Họ tên, chức vụ]

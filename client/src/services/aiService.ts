@@ -7,7 +7,23 @@ export interface Message {
 
 const API_BASE_URL = "/api";
 
-export async function sendMessage(messages: Message[]): Promise<string> {
+export async function sendMessage(
+  messages: Message[],
+  documentContextOrUseRAG?: string | boolean,
+  useRAG = true
+): Promise<string> {
+  // Backwards-compatible handling:
+  // sendMessage(messages)
+  // sendMessage(messages, useRAG:boolean)
+  // sendMessage(messages, documentContext:string)
+  // sendMessage(messages, documentContext:string, useRAG:boolean)
+  let documentContext: string | undefined;
+  if (typeof documentContextOrUseRAG === "boolean") {
+    useRAG = documentContextOrUseRAG;
+    documentContext = undefined;
+  } else {
+    documentContext = documentContextOrUseRAG;
+  }
   try {
     const response = await fetch(`${API_BASE_URL}/ai/chat`, {
       method: "POST",
@@ -19,6 +35,8 @@ export async function sendMessage(messages: Message[]): Promise<string> {
           role: msg.role,
           content: msg.content,
         })),
+        documentContext,
+        useRAG,
       }),
     });
 

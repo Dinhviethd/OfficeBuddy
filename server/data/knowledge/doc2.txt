@@ -1,0 +1,17 @@
+
+Quy trình lập biên bản họp
+
+1. Ghi rõ chủ đề họp và thời gian, địa điểm.
+2. Liệt kê người tham dự và người vắng mặt.
+3. Tóm tắt các nội dung thảo luận chính.
+4. Ghi lại các quyết định và người chịu trách nhiệm.
+5. Ký xác nhận của chủ tọa và thư ký.
+
+Mẫu giấy đi đường
+
+1. Họ tên: [Họ tên]
+2. Chức vụ: [Chức vụ]
+3. Mục đích công tác: [Mô tả]
+4. Thời gian đi/đến: [Ngày giờ]
+5. Phương tiện: [Phương tiện]
+6. Người phê duyệt: [Họ tên, chức vụ]

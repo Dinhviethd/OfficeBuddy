@@ -13,15 +13,17 @@ export interface Message {
 export interface ChatRequest {
   messages: Array<{ role: MessageRole; content: string }>;
   documentContext?: string; // Optional document content for context
+  useRAG?: boolean; // Enable RAG (Retrieval-Augmented Generation)
 }
 
-export const sendMessage = async (messages: Message[], documentContext?: string): Promise<string> => {
+export const sendMessage = async (messages: Message[], documentContext?: string, useRAG?: boolean): Promise<string> => {
   try {
     console.log("sendMessage called with:", {
       messagesCount: messages.length,
       hasDocumentContext: !!documentContext,
       documentContextLength: documentContext?.length,
       documentContextPreview: documentContext?.substring(0, 50),
+      useRAG: !!useRAG,
     });
 
     const request: ChatRequest = {
@@ -35,6 +37,12 @@ export const sendMessage = async (messages: Message[], documentContext?: string)
     if (documentContext) {
       console.log("Adding documentContext to request");
       request.documentContext = documentContext;
+    }
+
+    // Enable RAG if requested
+    if (useRAG) {
+      console.log("Enabling RAG");
+      request.useRAG = useRAG;
     }
 
     console.log("Sending request to:", `${API_BASE_URL}/ai/chat`, "with body:", request);
