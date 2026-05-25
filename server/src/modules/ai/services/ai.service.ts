@@ -121,6 +121,83 @@ export class AIService {
       throw error;
     }
   }
+
+  async generateDocument(documentType: string, details?: string): Promise<string> {
+    try {
+      console.log("AIService.generateDocument called with:", { documentType, detailsLength: details?.length });
+
+      const systemInstruction = `Bạn là một chuyên gia soạn thảo văn bản hành chính trong hệ thống eOffice.
+Nhiệm vụ của bạn là tạo nội dung tài liệu ${documentType} hoàn chỉnh, có cấu trúc chuẩn, chính thức và chuyên nghiệp.
+Tuân theo quy chuẩn soạn thảo văn bản hành chính Việt Nam.
+
+HƯỚNG DẪN ĐỊNH DẠNG:
+1. Tiêu đề: In đậm, canh giữa, VIẾT HOA
+2. Dòng trống: Dùng để tách các phần, không dùng dấu chấm
+3. Cấu trúc:
+   - Đầu trang: Logo/tên cơ quan
+   - Tiêu đề tài liệu
+   - Nội dung chính (chia thành các đoạn rõ ràng)
+   - Chữ ký, ngày tháng ở cuối
+4. Lề: Để khoảng cách hợp lý
+5. Không dùng dấu chấm hoặc gạch chân làm đệm
+6. Sử dụng khoảng trắng để tạo cấu trúc
+
+Trả về CHỈ nội dung tài liệu đã định dạng đẹp, không có bất kỳ giải thích hoặc bình luận thêm.`;
+
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash-lite",
+        systemInstruction: systemInstruction,
+      });
+
+      let prompt = `Hãy tạo một ${documentType} hoàn chỉnh, định dạng đẹp theo chuẩn Việt Nam`;
+      if (details) {
+        prompt += ` với thông tin sau: ${details}`;
+      }
+
+      console.log("Calling Gemini API for document generation with prompt:", prompt);
+
+      const result = await model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: prompt }],
+          },
+        ],
+        generationConfig: {
+          maxOutputTokens: 2048,
+        },
+      });
+
+      const response = result.response;
+      let text = response.text();
+
+      // Clean up excessive whitespace and dots
+      text = this.formatDocumentOutput(text);
+
+      console.log("Generated document content, length:", text.length);
+      return text;
+    } catch (error) {
+      console.error("Document Generation Error:", error);
+      throw error;
+    }
+  }
+
+  private formatDocumentOutput(content: string): string {
+    // Remove excessive dots and underscores used as placeholder
+    let formatted = content
+      .replace(/\.{5,}/g, "") // Remove 5+ consecutive dots
+      .replace(/_+/g, "") // Remove underscores
+      .replace(/\s{3,}/g, "\n") // Replace 3+ spaces with newline
+      .split("\n")
+      .map((line) => line.trim()) // Trim each line
+      .filter((line) => line.length > 0) // Remove empty lines
+      .join("\n");
+
+    // Add proper spacing between sections
+    formatted = formatted.replace(/\n(?=[A-Z])/g, "\n\n");
+
+    return formatted;
+  }
 }
 
 export const aiService = new AIService();

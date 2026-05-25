@@ -1,5 +1,9 @@
-import express from 'express'
 import dotenv from 'dotenv'
+
+// Load environment variables FIRST, before any other imports
+dotenv.config()
+
+import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 import cookieParser from 'cookie-parser'
@@ -9,8 +13,6 @@ import router from './routes/index'
 import { initDatabase } from '@/configs/database.config'
 import errorHandler from "@/middlewares/errorHandlermiddleware";
 
-
-dotenv.config()
 const app = express()
 const server = createServer(app)
 
