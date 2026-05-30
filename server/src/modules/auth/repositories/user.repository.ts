@@ -1,47 +1,35 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '@/configs/database.config';
 import { User } from '@/modules/auth/entities/user.model';
 import { CreateUserInput, UpdateProfileInput } from '@/modules/auth/schemas/auth.schema';
+import { mockUserStore } from './mock-user.store';
+
 export class UserRepository {
-  private repository: Repository<User>;
+  // Using mock store for development without database
+  // Replace with actual database repository when database is ready
 
-  constructor() {
-    this.repository = AppDataSource.getRepository(User);
-  }
-
-  // Tìm user theo email
   async findByEmail(email: string): Promise<User | null> {
-    return this.repository.findOne({
-      where: { email },
-    });
+    return mockUserStore.findByEmail(email);
   }
 
-  // Tìm user theo ID
+  async findByUsername(username: string): Promise<User | null> {
+    return mockUserStore.findByUsername(username);
+  }
+
   async findById(idUser: string): Promise<User | null> {
-    return this.repository.findOne({
-      where: { idUser },
-    });
+    return mockUserStore.findById(idUser);
   }
 
-  // Tạo user mới
   async create(userData: CreateUserInput): Promise<User> {
-    const user = this.repository.create(userData);
-    return this.repository.save(user);
+    return mockUserStore.create(userData);
   }
 
-  // Cập nhật user
   async update(idUser: string, updateData: UpdateProfileInput): Promise<User | null> {
-    await this.repository.update(idUser, updateData);
-    return this.findById(idUser);
+    return mockUserStore.update(idUser, updateData);
   }
 
-  // Xóa user
   async delete(idUser: string): Promise<boolean> {
-    const result = await this.repository.delete(idUser);
-    return result.affected !== 0;
+    return mockUserStore.delete(idUser);
   }
-
-
 }
 
 // Export singleton instance

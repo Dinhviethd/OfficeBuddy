@@ -1,0 +1,20 @@
+
+Mẫu tờ trình
+
+1. Tiêu đề: TỜ TRÌNH VỀ [NỘI DUNG]
+2. Kính gửi: [Tên người/đơn vị nhận]
+3. Người trình: [Họ tên, chức vụ]
+4. Lý do: Mô tả ngắn gọn lý do cần thực hiện.
+5. Nội dung đề nghị: Liệt kê cụ thể các đề nghị, bước thực hiện, thời gian, địa điểm.
+6. Kinh phí (nếu có): Dự toán, nguồn kinh phí, chứng từ kèm theo.
+7. Kết luận: Đề nghị phê duyệt/cho ý kiến.
+
+Ghi chú: Viết rõ ràng, chính xác, kèm phụ lục nếu có.
+
+Hướng dẫn soạn thông báo
+
+1. Tiêu đề: THÔNG BÁO VỀ [NỘI DUNG]
+2. Kính gửi: [Đơn vị/Người nhận]
+3. Nội dung: Trình bày ngắn gọn sự việc, yêu cầu, thời gian và địa điểm (nếu có). Nêu rõ người chịu trách nhiệm và hướng dẫn thực hiện.
+4. Thời hạn thực hiện: [dd/mm/yyyy]
+5. Người lập thông báo: [Họ tên, chức vụ]

@@ -1,5 +1,8 @@
 import * as React from "react";
 import { sendMessage, type Message } from "../services/aiService";
+import { readCurrentDocument, formatDocumentAsContext, type DocumentContent } from "../services/documentService";
+import { AuthService } from "../services/authService";
+import Login from "./Login";
 
 interface AppProps {
   title: string;
@@ -13,7 +16,20 @@ const quickActions = [
   "Đề nghị thanh toán",
 ];
 
+interface User {
+  idUser: string;
+  name: string;
+  username: string;
+  email?: string;
+  phone?: string;
+  avatarUrl?: string;
+}
+
 const App: React.FC<AppProps> = () => {
+  console.log("App component rendering");
+  
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [user, setUser] = React.useState<User | null>(null);
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: "welcome",
@@ -24,8 +40,45 @@ const App: React.FC<AppProps> = () => {
   ]);
   const [input, setInput] = React.useState<string>("");
   const [isTyping, setIsTyping] = React.useState<boolean>(false);
+  const [documentContent, setDocumentContent] = React.useState<DocumentContent | null>(null);
+  const [isLoadingDocument, setIsLoadingDocument] = React.useState(false);
+  const [useDocumentContext, setUseDocumentContext] = React.useState(true);
   const chatEndRef = React.useRef<HTMLDivElement | null>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+
+  // Check if user is already logged in on mount
+  React.useEffect(() => {
+    console.log("App useEffect: checking authentication");
+    try {
+      console.log("Checking for existing authentication...");
+      const token = AuthService.getAccessToken();
+      console.log("Access token exists:", !!token);
+      
+      if (!token) {
+        console.log("No token found, user will see login");
+        return;
+      }
+
+      console.log("Token found, attempting to restore user data");
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          console.log("Parsing user data from localStorage");
+          const userData = JSON.parse(userStr);
+          console.log("User data parsed successfully:", userData.username);
+          setUser(userData);
+          setIsAuthenticated(true);
+          console.log("User authentication restored");
+        } catch (parseErr) {
+          console.error("Failed to parse user data:", parseErr);
+          AuthService.clearTokens();
+          localStorage.removeItem("user");
+        }
+      }
+    } catch (err) {
+      console.error("Unexpected error in auth check:", err);
+    }
+  }, []);
 
   React.useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,6 +91,95 @@ const App: React.FC<AppProps> = () => {
     textareaRef.current.style.height = "0px";
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   }, [input]);
+
+  const handleLoginSuccess = (userData: User) => {
+    console.log("handleLoginSuccess called with:", userData);
+    try {
+      localStorage.setItem("user", JSON.stringify(userData));
+      console.log("User data saved to localStorage");
+      setUser(userData);
+      console.log("User state updated");
+      setIsAuthenticated(true);
+      console.log("Authentication state set to true");
+    } catch (err) {
+      console.error("Error saving user data:", err);
+      alert("Đã xảy ra lỗi khi lưu dữ liệu. Vui lòng thử lại.");
+    }
+  };
+
+  const handleLogout = () => {
+    try {
+      AuthService.clearTokens();
+      localStorage.removeItem("user");
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (err) {
+      console.error("Error during logout:", err);
+    }
+  };
+
+  // Show login if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Load document content from Word
+  const handleLoadDocument = async () => {
+    setIsLoadingDocument(true);
+    try {
+      console.log("handleLoadDocument: Starting to load document");
+      const content = await readCurrentDocument();
+      console.log("handleLoadDocument: Document loaded:", content);
+      if (content) {
+        console.log("handleLoadDocument: Setting document content and useDocumentContext");
+        setDocumentContent(content);
+        setUseDocumentContext(true);
+        
+        // Add message to chat
+        const sysMessage: Message = {
+          id: `system-${Date.now()}`,
+          role: "assistant",
+          content: `✅ Đã tải tài liệu thành công (${content.text.length} ký tự). Tôi sẽ sử dụng nội dung này để hỗ trợ bạn tốt hơn.`,
+          createdAt: new Date(),
+        };
+        setMessages((prev) => [...prev, sysMessage]);
+      } else {
+        console.log("handleLoadDocument: Failed to load document");
+        const errorMessage: Message = {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          content: "❌ Không thể đọc tài liệu. Vui lòng đảm bảo tài liệu đang mở.",
+          createdAt: new Date(),
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+      }
+    } catch (error) {
+      console.error("Error loading document:", error);
+      const errorMessage: Message = {
+        id: `error-${Date.now()}`,
+        role: "assistant",
+        content: "❌ Đã xảy ra lỗi khi đọc tài liệu.",
+        createdAt: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingDocument(false);
+    }
+  };
+
+  const getCurrentDocumentContext = async (): Promise<string | undefined> => {
+    if (!useDocumentContext) {
+      return undefined;
+    }
+
+    const content = await readCurrentDocument();
+    if (!content) {
+      return documentContent ? formatDocumentAsContext(documentContent) : undefined;
+    }
+
+    setDocumentContent(content);
+    return formatDocumentAsContext(content);
+  };
 
   const handleSend = async () => {
     const trimmed = input.trim();
@@ -58,7 +200,14 @@ const App: React.FC<AppProps> = () => {
     setIsTyping(true);
 
     try {
-      const reply = await sendMessage(nextMessages);
+      const context = await getCurrentDocumentContext();
+      console.log("Sending message with current document context:", {
+        useDocumentContext,
+        hasDocumentContent: !!documentContent,
+        contextLength: context?.length,
+      });
+
+      const reply = await sendMessage(nextMessages, context, true);
       const aiMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
@@ -323,9 +472,23 @@ const App: React.FC<AppProps> = () => {
             <div className="brand-subtitle">Trợ lý eOffice cho văn bản hành chính</div>
           </div>
         </div>
-        <div className="status">
-          <span className="status-dot" />
-          <span>Đang hoạt động</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {user && <span style={{ fontSize: "12px", color: "#66747f" }}>{user.name}</span>}
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "#c50f1f",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              padding: "6px 12px",
+              fontSize: "12px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Đăng xuất
+          </button>
         </div>
       </header>
 
@@ -375,6 +538,56 @@ const App: React.FC<AppProps> = () => {
           >
             Gửi
           </button>
+        </div>
+        
+        <div style={{
+          display: "flex",
+          gap: "10px",
+          padding: "10px 0",
+          borderTop: "1px solid #ddd",
+          flexWrap: "wrap",
+        }}>
+          <button
+            type="button"
+            onClick={() => void handleLoadDocument()}
+            disabled={isLoadingDocument || isTyping}
+            style={{
+              flex: 1,
+              minWidth: "120px",
+              padding: "8px 12px",
+              backgroundColor: documentContent ? "#1f4d7a" : "#333",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: isLoadingDocument || isTyping ? "not-allowed" : "pointer",
+              fontSize: "13px",
+              fontWeight: "600",
+              opacity: isLoadingDocument ? 0.7 : 1,
+            }}
+          >
+            {isLoadingDocument ? "⏳ Đang tải..." : documentContent ? "📄 Đã tải tài liệu" : "📄 Tải tài liệu"}
+          </button>
+          
+          {documentContent && (
+            <button
+              type="button"
+              onClick={() => setUseDocumentContext(!useDocumentContext)}
+              style={{
+                flex: 1,
+                minWidth: "120px",
+                padding: "8px 12px",
+                backgroundColor: useDocumentContext ? "#27ae60" : "#ccc",
+                color: useDocumentContext ? "white" : "#666",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: "600",
+              }}
+            >
+              {useDocumentContext ? "✅ Sử dụng tài liệu" : "❌ Không dùng tài liệu"}
+            </button>
+          )}
         </div>
       </div>
     </div>
