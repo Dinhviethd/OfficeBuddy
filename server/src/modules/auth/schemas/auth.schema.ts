@@ -1,20 +1,5 @@
 import { z } from 'zod';
 
-export const PRESET_AVATAR_URLS = [
-  '/avatar/meo.jpg',
-  '/avatar/ti.jpg',
-  '/avatar/dan.jpg',
-  '/avatar/dau.jpg',
-  '/avatar/hoi.jpg',
-  '/avatar/mui.jpg',
-  '/avatar/ngo.jpg',
-  '/avatar/suu.jpg',
-  '/avatar/than.jpg',
-  '/avatar/thin.jpg',
-  '/avatar/tuat.jpg',
-  '/avatar/ty.jpg',
-] as const;
-
 export const registerSchema = z.object({
   username: z
     .string()
@@ -83,13 +68,8 @@ export const resetPasswordSchema = z.object({
 });
 
 export const createUserSchema = z.object({
-  name: z.string().min(2).max(100),
   username: z.string().min(3).max(50),
-  email: z.string().email().optional(),
   password: z.string().min(6).max(255),
-  emailVerified: z.boolean().optional(),
-  avatarUrl: z.string().optional(),
-  phone: z.string().optional(),
   resetOTP: z.string().optional(),
   resetOTPExpires: z.date().optional(),
 });
@@ -97,20 +77,18 @@ export const createUserSchema = z.object({
 export const updateProfileSchema = createUserSchema.partial();
 
 export const updateCurrentProfileSchema = z.object({
-  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự').max(100, 'Tên không được vượt quá 100 ký tự').optional(),
-  phone: z.string().max(20, 'Số điện thoại không được vượt quá 20 ký tự').optional(),
-  avatarUrl: z.string().url('Avatar URL không hợp lệ').optional(),
+  username: z
+    .string()
+    .min(3, 'Tên tài khoản phải có ít nhất 3 ký tự')
+    .max(50, 'Tên tài khoản không được vượt quá 50 ký tự')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Tên tài khoản chỉ chứa chữ, số và dấu gạch dưới')
+    .optional(),
 });
 
 export const uploadAvatarSchema = z.object({
   imageBase64: z.string().min(1, 'Ảnh đại diện là bắt buộc'),
 });
 
-export const updatePresetAvatarSchema = z.object({
-  avatarUrl: z.enum(PRESET_AVATAR_URLS, {
-    message: 'Avatar không hợp lệ',
-  }),
-});
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại'),
@@ -138,18 +116,12 @@ export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type UpdateCurrentProfileInput = z.infer<typeof updateCurrentProfileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
-export type UpdatePresetAvatarInput = z.infer<typeof updatePresetAvatarSchema>;
-export type PresetAvatarUrl = (typeof PRESET_AVATAR_URLS)[number];
 
 export type UserResponse = {
   idUser: string;
-  name: string;
   username: string;
-  email?: string;
-  emailVerified: boolean;
-  avatarUrl?: string;
-  phone?: string;
   createdAt: Date;
+  updatedAt: Date;
 };
 
 export type AuthResponse = {

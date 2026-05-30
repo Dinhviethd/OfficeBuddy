@@ -49,7 +49,6 @@ const checkAccountStatus = async (req, res, next) => {
         const userRepository = database_config_1.AppDataSource.getRepository(user_model_1.User);
         const user = await userRepository.findOne({
             where: { idUser: userId },
-            select: ['emailVerified']
         });
         if (!user)
             throw new error_response_1.AppError(404, "User not found");

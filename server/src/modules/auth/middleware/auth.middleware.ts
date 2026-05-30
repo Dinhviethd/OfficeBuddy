@@ -19,6 +19,7 @@ declare global {
 
 export const authMiddleware = (
   req: Request,
+  
   res: Response,
   next: NextFunction
 ) => {
@@ -64,7 +65,6 @@ export const checkAccountStatus = async (
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { idUser: userId },
-      select: ['emailVerified']
     });
 
     if (!user) throw new AppError(404, "User not found");

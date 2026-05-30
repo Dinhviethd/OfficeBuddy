@@ -32,6 +32,26 @@ class AIController {
             next(error);
         }
     }
+    async generateDocument(req, res, next) {
+        try {
+            const { documentType, details } = req.body;
+            console.log("Generate Document request received:", { documentType, detailsLength: details?.length });
+            if (!documentType) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Document type is required",
+                });
+            }
+            const content = await ai_service_1.aiService.generateDocument(documentType, details);
+            res.json({
+                success: true,
+                content,
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
 }
 exports.AIController = AIController;
 exports.aiController = new AIController();

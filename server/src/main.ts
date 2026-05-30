@@ -7,8 +7,6 @@ import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 import cookieParser from 'cookie-parser'
-import path from 'path'
-import jwt from 'jsonwebtoken'
 import router from './routes/index'
 import { initDatabase } from '@/configs/database.config'
 import errorHandler from "@/middlewares/errorHandlermiddleware";
@@ -31,15 +29,6 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
-// TODO: Database initialization disabled for now
-// To enable: Install SQLite3 (npm install sqlite3) or configure PostgreSQL connection
-// See database.config.ts for configuration
-// initDatabase().catch(err => {
-//     console.error("Failed to connect to database!");
-//     console.error(err);
-//     process.exit(1);
-// });
-
 app.use("/api", router)
 
 app.get("/", (req, res) => {
@@ -60,7 +49,16 @@ app.use(errorHandler.errorHandler)
 
 const PORT = process.env.PORT || 8000
 
+const bootstrap = async () => {
+    await initDatabase();
 
-server.listen(PORT, () => {
-    console.log(`Server run at http://localhost:${PORT}`)
-})
+    server.listen(PORT, () => {
+        console.log(`Server run at http://localhost:${PORT}`)
+    })
+}
+
+bootstrap().catch(err => {
+    console.error("Failed to start server!");
+    console.error(err);
+    process.exit(1);
+});

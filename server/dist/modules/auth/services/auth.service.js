@@ -7,30 +7,25 @@ exports.authService = exports.AuthService = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_repository_1 = require("../../../modules/auth/repositories/user.repository");
-const auth_schema_1 = require("../../../modules/auth/schemas/auth.schema");
 const error_response_1 = require("../../../utils/error.response");
 const email_1 = require("../../../utils/email");
-const upload_1 = require("../../../utils/upload");
 class AuthService {
     userRepo;
     constructor() {
         this.userRepo = user_repository_1.userRepository;
     }
     async register(input) {
-        const { username, password } = input;
+        const username = input.username.trim();
+        const { password } = input;
         const existingUser = await this.userRepo.findByUsername(username);
         if (existingUser) {
             throw new error_response_1.AppError(400, 'Tên tài khoản đã được sử dụng');
         }
         const salt = await bcryptjs_1.default.genSalt(10);
         const hashedPassword = await bcryptjs_1.default.hash(password, salt);
-        const randomAvatarUrl = auth_schema_1.PRESET_AVATAR_URLS[Math.floor(Math.random() * auth_schema_1.PRESET_AVATAR_URLS.length)];
         const newUser = await this.userRepo.create({
-            name: username, // Use username as the default name
             username,
             password: hashedPassword,
-            emailVerified: false,
-            avatarUrl: randomAvatarUrl,
         });
         const tokens = this.generateTokens(newUser.idUser);
         return {
@@ -39,7 +34,8 @@ class AuthService {
         };
     }
     async login(input) {
-        const { username, password } = input;
+        const username = input.username.trim();
+        const { password } = input;
         const user = await this.userRepo.findByUsername(username);
         if (!user) {
             throw new error_response_1.AppError(401, 'Tên tài khoản hoặc mật khẩu không chính xác');
@@ -86,6 +82,12 @@ class AuthService {
         if (!user) {
             throw new error_response_1.AppError(404, 'User không tồn tại');
         }
+        if (input.username && input.username !== user.username) {
+            const existingUser = await this.userRepo.findByUsername(input.username);
+            if (existingUser && existingUser.idUser !== userId) {
+                throw new error_response_1.AppError(400, 'Tên tài khoản đã được sử dụng');
+            }
+        }
         const updatedUser = await this.userRepo.update(userId, input);
         if (!updatedUser) {
             throw new error_response_1.AppError(404, 'User không tồn tại');
@@ -107,38 +109,7 @@ class AuthService {
             password: hashedPassword,
         });
     }
-    async uploadAvatar(userId, fileBuffer) {
-        const user = await this.userRepo.findById(userId);
-        if (!user) {
-            throw new error_response_1.AppError(404, 'User không tồn tại');
-        }
-        const uploadResult = await (0, upload_1.uploadBufferToCloudinary)(fileBuffer, {
-            folder: 'honsuviet/avatars',
-            publicId: `${userId}-${Date.now()}`,
-        });
-        const updatedUser = await this.userRepo.update(userId, {
-            avatarUrl: uploadResult.secure_url,
-        });
-        if (!updatedUser) {
-            throw new error_response_1.AppError(404, 'User không tồn tại');
-        }
-        return this.toUserResponse(updatedUser);
-    }
-    async updatePresetAvatar(userId, avatarUrl) {
-        const user = await this.userRepo.findById(userId);
-        if (!user) {
-            throw new error_response_1.AppError(404, 'User không tồn tại');
-        }
-        const updatedUser = await this.userRepo.update(userId, {
-            avatarUrl,
-        });
-        if (!updatedUser) {
-            throw new error_response_1.AppError(404, 'User không tồn tại');
-        }
-        return this.toUserResponse(updatedUser);
-    }
     async logout(userId) {
-        // Có thể thêm logic để invalidate token ở đây
     }
     async forgotPassword(input) {
         const { email } = input;
@@ -209,13 +180,9 @@ class AuthService {
     toUserResponse(user) {
         return {
             idUser: user.idUser,
-            name: user.name,
             username: user.username,
-            email: user.email,
-            emailVerified: user.emailVerified,
-            avatarUrl: user.avatarUrl,
-            phone: user.phone,
             createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
         };
     }
 }

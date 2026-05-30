@@ -9,16 +9,13 @@ import {
   VerifyOTPInput,
   UpdateCurrentProfileInput,
   ChangePasswordInput,
-  PresetAvatarUrl,
   AuthResponse,
   UserResponse,
-  PRESET_AVATAR_URLS,
 } from '@/modules/auth/schemas/auth.schema';
 import { AppError } from '@/utils/error.response';
 import { User } from "@/modules/auth/entities/user.model";
 import { generateOTP, sendOTPEmail } from '@/utils/email';
 import { uploadBufferToCloudinary } from '@/utils/upload';
-
 
 export class AuthService {
   private userRepo: UserRepository;
@@ -29,7 +26,8 @@ export class AuthService {
 
   
   async register(input: RegisterInput): Promise<AuthResponse> {
-    const { username, password } = input;
+    const username = input.username.trim();
+    const { password } = input;
 
     const existingUser = await this.userRepo.findByUsername(username);
     if (existingUser) {
@@ -40,7 +38,6 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await this.userRepo.create({
-      name: username, // Use username as the default name
       username,
       password: hashedPassword,
     });
@@ -54,7 +51,8 @@ export class AuthService {
   }
 
   async login(input: LoginInput): Promise<AuthResponse> {
-    const { username, password } = input;
+    const username = input.username.trim();
+    const { password } = input;
 
     const user = await this.userRepo.findByUsername(username);
     if (!user) {
@@ -115,6 +113,13 @@ export class AuthService {
       throw new AppError(404, 'User không tồn tại');
     }
 
+    if (input.username && input.username !== user.username) {
+      const existingUser = await this.userRepo.findByUsername(input.username);
+      if (existingUser && existingUser.idUser !== userId) {
+        throw new AppError(400, 'Tên tài khoản đã được sử dụng');
+      }
+    }
+
     const updatedUser = await this.userRepo.update(userId, input);
     if (!updatedUser) {
       throw new AppError(404, 'User không tồn tại');
@@ -142,47 +147,7 @@ export class AuthService {
     });
   }
 
-  async uploadAvatar(userId: string, fileBuffer: Buffer): Promise<UserResponse> {
-    const user = await this.userRepo.findById(userId);
-    if (!user) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    const uploadResult = await uploadBufferToCloudinary(fileBuffer, {
-      folder: 'honsuviet/avatars',
-      publicId: `${userId}-${Date.now()}`,
-    });
-
-    const updatedUser = await this.userRepo.update(userId, {
-      avatarUrl: uploadResult.secure_url,
-    });
-
-    if (!updatedUser) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    return this.toUserResponse(updatedUser);
-  }
-
-  async updatePresetAvatar(userId: string, avatarUrl: PresetAvatarUrl): Promise<UserResponse> {
-    const user = await this.userRepo.findById(userId);
-    if (!user) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    const updatedUser = await this.userRepo.update(userId, {
-      avatarUrl,
-    });
-
-    if (!updatedUser) {
-      throw new AppError(404, 'User không tồn tại');
-    }
-
-    return this.toUserResponse(updatedUser);
-  }
-
   async logout(userId: string): Promise<void> {
-    // Có thể thêm logic để invalidate token ở đây
   }
 
   async forgotPassword(input: SendOTPInput): Promise<void> {
@@ -303,13 +268,9 @@ export class AuthService {
   private toUserResponse(user: User): UserResponse {
     return {
       idUser: user.idUser,
-      name: user.name,
       username: user.username,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      avatarUrl: user.avatarUrl,
-      phone: user.phone,
       createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   }
 }

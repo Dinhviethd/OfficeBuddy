@@ -18,11 +18,9 @@ const quickActions = [
 
 interface User {
   idUser: string;
-  name: string;
   username: string;
-  email?: string;
-  phone?: string;
-  avatarUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const App: React.FC<AppProps> = () => {
@@ -473,7 +471,7 @@ const App: React.FC<AppProps> = () => {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          {user && <span style={{ fontSize: "12px", color: "#66747f" }}>{user.name}</span>}
+          {user && <span style={{ fontSize: "12px", color: "#66747f" }}>{user.username}</span>}
           <button
             onClick={handleLogout}
             style={{

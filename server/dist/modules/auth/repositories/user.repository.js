@@ -1,29 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRepository = exports.UserRepository = void 0;
-const mock_user_store_1 = require("./mock-user.store");
+const database_config_1 = require("../../../configs/database.config");
+const user_model_1 = require("../../../modules/auth/entities/user.model");
 class UserRepository {
-    // Using mock store for development without database
-    // Replace with actual database repository when database is ready
+    get repository() {
+        return database_config_1.AppDataSource.getRepository(user_model_1.User);
+    }
     async findByEmail(email) {
-        return mock_user_store_1.mockUserStore.findByEmail(email);
+        return null;
     }
     async findByUsername(username) {
-        return mock_user_store_1.mockUserStore.findByUsername(username);
+        return this.repository.findOne({ where: { username } });
     }
     async findById(idUser) {
-        return mock_user_store_1.mockUserStore.findById(idUser);
+        return this.repository.findOne({ where: { idUser } });
     }
     async create(userData) {
-        return mock_user_store_1.mockUserStore.create(userData);
+        const user = this.repository.create(userData);
+        return this.repository.save(user);
     }
     async update(idUser, updateData) {
-        return mock_user_store_1.mockUserStore.update(idUser, updateData);
+        const result = await this.repository.update({ idUser }, updateData);
+        if (!result.affected) {
+            return null;
+        }
+        return this.findById(idUser);
     }
     async delete(idUser) {
-        return mock_user_store_1.mockUserStore.delete(idUser);
+        const result = await this.repository.delete({ idUser });
+        return Boolean(result.affected);
     }
 }
 exports.UserRepository = UserRepository;
-// Export singleton instance
 exports.userRepository = new UserRepository();
