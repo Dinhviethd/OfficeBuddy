@@ -8,6 +8,7 @@ export interface Message {
   role: MessageRole;
   content: string;
   createdAt: Date;
+  isGeneratedDocument?: boolean; // Mark if this is auto-generated document
 }
 
 export interface ChatRequest {
@@ -66,6 +67,40 @@ export const sendMessage = async (messages: Message[], documentContext?: string,
     return data.reply;
   } catch (error) {
     console.error("AI Service Error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Generate a document from the AI
+ * @param documentType Type of document (e.g., "Tờ trình", "Thông báo")
+ * @param details Optional additional details for the document
+ * @returns Generated document content
+ */
+export const generateDocument = async (documentType: string, details?: string): Promise<string> => {
+  try {
+    console.log("generateDocument called with:", { documentType, detailsLength: details?.length });
+
+    const response = await fetch(`${API_BASE_URL}/ai/generate-document`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ documentType, details }),
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to generate document");
+    }
+
+    const data = await response.json();
+    console.log("Generated document content length:", data.content.length);
+    return data.content;
+  } catch (error) {
+    console.error("Document Generation Error:", error);
     throw error;
   }
 };

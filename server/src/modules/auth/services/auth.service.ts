@@ -38,15 +38,11 @@ export class AuthService {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const randomAvatarUrl =
-      PRESET_AVATAR_URLS[Math.floor(Math.random() * PRESET_AVATAR_URLS.length)];
 
     const newUser = await this.userRepo.create({
       name: username, // Use username as the default name
       username,
       password: hashedPassword,
-      emailVerified: false,
-      avatarUrl: randomAvatarUrl,
     });
 
     const tokens = this.generateTokens(newUser.idUser);

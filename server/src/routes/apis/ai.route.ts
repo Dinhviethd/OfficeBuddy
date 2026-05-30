@@ -9,4 +9,9 @@ router.post("/chat", chatRateLimiter, (req, res, next) => {
   aiController.chat(req, res, next);
 });
 
+// Endpoint để generate tài liệu
+router.post("/generate-document", chatRateLimiter, (req, res, next) => {
+  aiController.generateDocument(req, res, next);
+});
+
 export default router;
