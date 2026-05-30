@@ -1,17 +1,13 @@
 import { Router } from "express";
-import { aiController } from "@/modules/ai/controllers/ai.controller";
+import { chat, generateDocument } from "@/modules/ai/ai.controller";
 import { chatRateLimiter } from "@/middlewares/rateLimiter.middleware";
 
 const router = Router();
 
 // Áp dụng rate limiting cho endpoint chat
-router.post("/chat", chatRateLimiter, (req, res, next) => {
-  aiController.chat(req, res, next);
-});
+router.post("/chat", chatRateLimiter, chat);
 
 // Endpoint để generate tài liệu
-router.post("/generate-document", chatRateLimiter, (req, res, next) => {
-  aiController.generateDocument(req, res, next);
-});
+router.post("/generate-document", chatRateLimiter, generateDocument);
 
 export default router;

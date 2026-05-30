@@ -7,16 +7,18 @@ import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 import cookieParser from 'cookie-parser'
+import path from 'path'
 import router from './routes/index'
 import { initDatabase } from '@/configs/database.config'
 import errorHandler from "@/middlewares/errorHandlermiddleware";
+import aiRouter from "@/modules/ai/ai.route";
 
 const app = express()
 const server = createServer(app)
 
-// Static files serving (if needed for deployment)
-// const clientBuildPath = path.resolve('/app/public');
-// app.use(express.static(clientBuildPath));
+// Phục vụ thư mục tĩnh public chứa Web Portal
+const publicPath = path.join(process.cwd(), 'public');
+app.use(express.static(publicPath));
 
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }))
@@ -30,8 +32,9 @@ app.use(cors({
 }))
 
 app.use("/api", router)
+app.use("/api/ai", aiRouter);
 
-app.get("/", (req, res) => {
+app.get("/api-status", (req, res) => {
     res.json({ 
         success: true, 
         message: "eOffice API Server is running",

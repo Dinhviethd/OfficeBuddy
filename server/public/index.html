@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eOffice - Trường Đại học Bách Khoa - Đại học Đà Nẵng</title>
+  <!-- Modern Segoe UI & Inter fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── DESIGN SYSTEM & VARS ──────────────────────────────── */
+    :root {
+      --primary-color: #0078d4;
+      --primary-hover: #005a9e;
+      --primary-light: #f0f6fd;
+      --bg-dark: #1b1b1b;
+      --bg-light: #f3f5f8;
+      --card-bg: #ffffff;
+      --text-main: #242424;
+      --text-muted: #595959;
+      --border-color: #e0e0e0;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #0a3663 0%, #0078d4 100%);
+      color: #ffffff;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      font-size: 32px;
+      background: rgba(255,255,255,0.15);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    .header-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-text p {
+      font-size: 12px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.1);
+      padding: 6px 16px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background-color: #ffffff;
+      color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ─── MAIN LAYOUT ───────────────────────────────────────── */
+    main {
+      max-width: 1300px;
+      margin: 40px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 8fr 3fr;
+      gap: 32px;
+    }
+
+    /* ─── PORTAL HOME CONTENT ────────────────────────────────── */
+    .portal-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #0a3663;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-wrapper {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .search-wrapper h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+    }
+
+    .search-btn {
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+      padding: 0 24px;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background-color 0.2s;
+    }
+
+    .search-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Category Grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .category-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: left;
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 160px;
+    }
+
+    .category-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-color);
+    }
+
+    .category-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .category-icon {
+      font-size: 26px;
+      background-color: var(--primary-light);
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--primary-color);
+    }
+
+    .category-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-top: 14px;
+    }
+
+    .category-card p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ─── SIDEBAR ───────────────────────────────────────────── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .sidebar-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .sidebar-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0a3663;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 8px;
+    }
+
+    .doc-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .doc-list-item:last-child {
+      border-bottom: none;
+    }
+
+    .doc-list-item:hover {
+      color: var(--primary-color);
+    }
+
+    .doc-badge {
+      font-size: 10px;
+      background-color: #e2f1ff;
+      color: var(--primary-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ─── FLOATING CHAT ASSISTANT WIDGET ─────────────────────── */
+    .chat-bubble-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    /* Floating Bubble Button */
+    .chat-bubble-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(0, 120, 212, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      border: none;
+      position: relative;
+    }
+
+    .chat-bubble-btn:hover {
+      transform: scale(1.08) rotate(5deg);
+      box-shadow: 0 6px 20px rgba(0, 120, 212, 0.55);
+    }
+
+    /* Bouncing Ring Pulse Animation */
+    .chat-bubble-btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      top: -2px;
+      left: -2px;
+      box-shadow: 0 0 8px var(--primary-color);
+      animation: bubble-pulse 2s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes bubble-pulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+      70% {
+        transform: scale(1.3);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+    }
+
+    .chat-tooltip {
+      position: absolute;
+      right: 76px;
+      top: 15px;
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .chat-bubble-container:hover .chat-tooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Expanded Chat Panel */
+    .chat-panel {
+      position: fixed;
+      bottom: 105px;
+      right: 30px;
+      width: 400px;
+      height: 600px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1001;
+      transform: scale(0.8) translateY(50px);
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: bottom right;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+    }
+
+    .chat-panel.active {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Chat Header */
+    .chat-header {
+      background: linear-gradient(135deg, #0a3663 0%, #0078d4 100%);
+      color: #ffffff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header-icon {
+      font-size: 20px;
+      background-color: rgba(255,255,255,0.18);
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .chat-header-title h4 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .chat-header-title p {
+      font-size: 10px;
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chat-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-btn-action {
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.8;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .chat-btn-action:hover {
+      background-color: rgba(255,255,255,0.12);
+      opacity: 1;
+    }
+
+    /* Chat Messages Box */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background-color: #f7f9fb;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chat-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .chat-row.user {
+      justify-content: flex-end;
+    }
+
+    .chat-row.assistant {
+      justify-content: flex-start;
+    }
+
+    .chat-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      animation: bubble-fade 0.2s ease-out;
+    }
+
+    @keyframes bubble-fade {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-bubble.user {
+      background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,120,212,0.18);
+    }
+
+    .chat-bubble.assistant {
+      background-color: #ffffff;
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    /* Citations / Sources block */
+    .chat-sources-block {
+      margin-top: 6px;
+      background: #ffffff;
+      border: 1px solid #eef1f5;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 11.5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+      width: 100%;
+      animation: bubble-fade 0.2s ease-out;
+    }
+
+    .chat-sources-header {
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .chat-source-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 0;
+      color: #6a7b8c;
+      border-bottom: 1px dashed #f0f3f6;
+    }
+
+    .chat-source-item:last-child {
+      border-bottom: none;
+    }
+
+    .chat-source-sim {
+      background-color: #f0f6fd;
+      color: var(--primary-color);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Thinking State */
+    .chat-thinking {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.04);
+      font-size: 12.5px;
+      color: var(--text-muted);
+      width: fit-content;
+      animation: bubble-fade 0.25s ease-out;
+    }
+
+    .chat-thinking-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .chat-thinking-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #999;
+      animation: bouncing-dot 1.2s infinite;
+    }
+
+    .chat-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .chat-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bouncing-dot {
+      0%, 100% {
+        transform: translateY(0);
+        opacity: 0.3;
+      }
+      50% {
+        transform: translateY(-4px);
+        opacity: 1;
+      }
+    }
+
+    /* Chat Input Panel */
+    .chat-input-wrapper {
+      padding: 14px 18px;
+      background-color: #ffffff;
+      border-top: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .chat-textarea {
+      flex: 1;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13.5px;
+      line-height: 1.4;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      max-height: 100px;
+      background-color: #fafafa;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .chat-textarea:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+      background-color: #ffffff;
+    }
+
+    .chat-send-btn {
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .chat-send-btn:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .chat-send-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .chat-input-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">🏢</div>
+      <div class="header-text">
+        <h1>eOFFICE - Hệ thống Hành chính điện tử</h1>
+        <p>Trường Đại học Bách Khoa - Đại học Đà Nẵng</p>
+      </div>
+    </div>
+    <div class="user-profile">
+      <span class="user-name">Cán bộ: Nguyễn Văn A</span>
+      <div class="user-avatar">CB</div>
+    </div>
+  </header>
+
+  <!-- ─── MAIN PORTAL CONTENT ─── -->
+  <main>
+    <!-- Left column: Primary Dashboard -->
+    <section>
+      <!-- Search -->
+      <div class="search-wrapper">
+        <h2>Tra cứu nhanh kho văn bản, quy định của trường</h2>
+        <div class="search-input-group">
+          <input type="text" class="search-input" id="portalSearch" placeholder="Nhập từ khóa tìm kiếm (Ví dụ: quy định học bổng, mẫu tờ trình, danh bạ phòng đào tạo...)">
+          <button class="search-btn" onclick="triggerSearchAI()">Tìm kiếm</button>
+        </div>
+      </div>
+
+      <h2 class="portal-section-title">📁 Kho tài liệu & Quy trình eOffice</h2>
+      
+      <!-- Category Grid matching the 9 RAG folders -->
+      <div class="category-grid">
+        <div class="category-card" onclick="askAICategory('Biểu mẫu')">
+          <div class="category-card-top">
+            <div class="category-icon">📋</div>
+          </div>
+          <div>
+            <h3>Biểu mẫu</h3>
+            <p>PDF scan + DOCX mẫu</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Công tác sinh viên')">
+          <div class="category-card-top">
+            <div class="category-icon">👥</div>
+          </div>
+          <div>
+            <h3>Công tác sinh viên</h3>
+            <p>Chế độ chính sách, học bổng</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Danh bạ')">
+          <div class="category-card-top">
+            <div class="category-icon">📞</div>
+          </div>
+          <div>
+            <h3>Danh bạ</h3>
+            <p>Thông tin liên hệ toàn trường</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Đào tạo')">
+          <div class="category-card-top">
+            <div class="category-icon">🎓</div>
+          </div>
+          <div>
+            <h3>Đào tạo</h3>
+            <p>Quy chế, chương trình đào tạo</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Học liệu, truyền thông')">
+          <div class="category-card-top">
+            <div class="category-icon">📢</div>
+          </div>
+          <div>
+            <h3>Học liệu & Truyền thông</h3>
+            <p>Tài liệu giảng dạy, truyền thông</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Khảo thí')">
+          <div class="category-card-top">
+            <div class="category-icon">✍️</div>
+          </div>
+          <div>
+            <h3>Khảo thí</h3>
+            <p>Lịch thi, quy định thi cử</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Quy định')">
+          <div class="category-card-top">
+            <div class="category-icon">📜</div>
+          </div>
+          <div>
+            <h3>Quy định</h3>
+            <p>Quy chế nội bộ, hướng dẫn</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Tài chính, kế toán')">
+          <div class="category-card-top">
+            <div class="category-icon">💰</div>
+          </div>
+          <div>
+            <h3>Tài chính & Kế toán</h3>
+            <p>Thanh toán, công tác phí</p>
+          </div>
+        </div>
+
+        <div class="category-card" onclick="askAICategory('Văn thư, lưu trữ')">
+          <div class="category-card-top">
+            <div class="category-icon">📂</div>
+          </div>
+          <div>
+            <h3>Văn thư & Lưu trữ</h3>
+            <p>Số hiệu văn bản, lưu trữ hồ sơ</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right column: Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>📢 Thông báo eOffice mới nhất</h3>
+        <div class="doc-list-item">
+          <span>Thông báo về việc nghỉ lễ Quốc khánh 02/09</span>
+          <span class="doc-badge">Quan trọng</span>
+        </div>
+        <div class="doc-list-item">
+          <span>Quyết định ban hành Quy chế Đào tạo tín chỉ mới</span>
+          <span class="doc-badge">Mới</span>
+        </div>
+        <div class="doc-list-item">
+          <span>Hướng dẫn thủ tục đề nghị thanh toán công tác phí</span>
+          <span class="doc-badge">Văn bản</span>
+        </div>
+        <div class="doc-list-item">
+          <span>Cập nhật danh bạ điện thoại nội bộ các Phòng, Khoa</span>
+          <span class="doc-badge">Cập nhật</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>💡 Tính năng nổi bật</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">
+          Hệ thống eOffice trường ĐHBK Đà Nẵng đã tích hợp <strong>Trợ lý ảo AI</strong> sử dụng công nghệ RAG + Gemini 2.5 Flash.
+        </p>
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Bấm vào biểu tượng chatbot ở góc phải màn hình để hỏi đáp nhanh quy chế học tập, biểu mẫu hành chính, danh bạ liên lạc!
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ─── FLOATING CHAT WIDGET ─── -->
+  <div class="chat-bubble-container">
+    <!-- Tooltip -->
+    <div class="chat-tooltip">Hỏi Trợ lý ảo eOffice AI</div>
+    
+    <!-- Bubble trigger button -->
+    <button class="chat-bubble-btn" id="chatTriggerBtn" onclick="toggleChatPanel()">🤖</button>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chatPanel">
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="chat-header-icon">🤖</div>
+          <div class="chat-header-title">
+            <h4>Trợ lý ảo AI - eOffice DUT</h4>
+            <p><span style="color: #4cd137;">●</span> Hoạt động • Hỗ trợ RAG</p>
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="chat-btn-action" title="Xóa lịch sử chat" onclick="clearHistory()">🗑</button>
+          <button class="chat-btn-action" title="Đóng" onclick="toggleChatPanel()">✕</button>
+        </div>
+      </div>
+
+      <!-- Messages Box -->
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-row assistant">
+          <div class="chat-bubble assistant">Xin chào! Tôi là Trợ lý eOffice AI của Trường ĐH Bách Khoa - ĐHĐN. Tôi có thể giúp bạn tra cứu quy định học tập, tài chính, biểu mẫu hành chính hoặc thông tin liên lạc của trường. Bạn cần tôi hỗ trợ thông tin gì hôm nay?</div>
+        </div>
+      </div>
+
+      <!-- Input Panel -->
+      <div class="chat-input-wrapper">
+        <div class="chat-input-row">
+          <textarea class="chat-textarea" id="chatInput" placeholder="Nhập câu hỏi của bạn..." rows="1" onkeydown="handleInputKeyDown(event)"></textarea>
+          <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="chat-input-hint">Enter để gửi · Shift+Enter để xuống dòng</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── STATE MANAGEMENT ─────────────────────────────────────
+    let isChatOpen = false;
+    let sessionId = "session_portal_" + Date.now();
+    const API_BASE = "/api/ai"; // Served directly from same host/port!
+
+    const chatPanel = document.getElementById("chatPanel");
+    const chatMessages = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const chatSendBtn = document.getElementById("chatSendBtn");
+
+    // Enable/disable send button based on text input
+    chatInput.addEventListener("input", function() {
+      chatInput.style.height = "0px";
+      chatInput.style.height = (chatInput.scrollHeight - 6) + "px";
+      
+      const hasText = chatInput.value.trim().length > 0;
+      chatSendBtn.disabled = !hasText;
+    });
+
+    // Toggle Chat visibility
+    function toggleChatPanel() {
+      isChatOpen = !isChatOpen;
+      if (isChatOpen) {
+        chatPanel.classList.add("active");
+        chatInput.focus();
+        // Auto scroll to bottom when opening
+        scrollToBottom();
+      } else {
+        chatPanel.classList.remove("active");
+      }
+    }
+
+    // Scroll to the bottom of the chat container
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Keyboard handlers
+    function handleInputKeyDown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    // Add bubble in the chat view
+    function appendMessage(role, content, sources = null) {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = `chat-row ${role}`;
+      
+      const bubbleDiv = document.createElement("div");
+      bubbleDiv.className = `chat-bubble ${role}`;
+      bubbleDiv.textContent = content;
+      
+      rowDiv.appendChild(bubbleDiv);
+      chatMessages.appendChild(rowDiv);
+
+      // Append sources under assistant responses if available
+      if (role === "assistant" && sources && sources.length > 0) {
+        const sourcesBlock = document.createElement("div");
+        sourcesBlock.className = "chat-sources-block";
+        
+        const header = document.createElement("div");
+        header.className = "chat-sources-header";
+        header.innerHTML = "📎 Nguồn tham khảo:";
+        sourcesBlock.appendChild(header);
+
+        sources.forEach(src => {
+          const item = document.createElement("div");
+          item.className = "chat-source-item";
+          item.innerHTML = `
+            <span>📁 ${src.folder} / ${src.file}</span>
+            <span class="chat-source-sim">${src.similarity}</span>
+          `;
+          sourcesBlock.appendChild(item);
+        });
+
+        // Insert sources inside an assistant row wrapper
+        const sourcesWrapper = document.createElement("div");
+        sourcesWrapper.className = "chat-row assistant";
+        sourcesWrapper.appendChild(sourcesBlock);
+        chatMessages.appendChild(sourcesWrapper);
+      }
+
+      scrollToBottom();
+    }
+
+    // Show dynamic thinking loading indicator
+    function showThinkingIndicator() {
+      const thinkingRow = document.createElement("div");
+      thinkingRow.className = "chat-row assistant";
+      thinkingRow.id = "thinkingIndicator";
+
+      thinkingRow.innerHTML = `
+        <div class="chat-thinking">
+          <div class="chat-thinking-dots">
+            <span class="chat-thinking-dot"></span>
+            <span class="chat-thinking-dot"></span>
+            <span class="chat-thinking-dot"></span>
+          </div>
+          <span>⏳ Đang suy nghĩ...</span>
+        </div>
+      `;
+      chatMessages.appendChild(thinkingRow);
+      scrollToBottom();
+    }
+
+    // Hide thinking indicator
+    function removeThinkingIndicator() {
+      const indicator = document.getElementById("thinkingIndicator");
+      if (indicator) {
+        indicator.remove();
+      }
+    }
+
+    // Core Send Message Logic
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      // Add user message
+      appendMessage("user", text);
+      
+      // Reset input
+      chatInput.value = "";
+      chatInput.style.height = "auto";
+      chatSendBtn.disabled = true;
+
+      // Show thinking status
+      showThinkingIndicator();
+
+      try {
+        const response = await fetch(`${API_BASE}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: sessionId,
+            message: text
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối máy chủ");
+        }
+
+        const data = await response.json();
+        removeThinkingIndicator();
+        
+        // Add assistant message with sources
+        appendMessage("assistant", data.answer, data.sources);
+      } catch (err) {
+        removeThinkingIndicator();
+        appendMessage("assistant", "❌ Đã có lỗi xảy ra trong quá trình xử lý câu hỏi của bạn. Vui lòng thử lại sau.");
+        console.error("Chat API error:", err);
+      }
+    }
+
+    // Clear session history
+    async function clearHistory() {
+      try {
+        await fetch(`${API_BASE}/chat/${sessionId}`, { method: "DELETE" });
+      } catch (err) {
+        console.error("Error clearing chat session:", err);
+      }
+      
+      // Reset variables
+      sessionId = "session_portal_" + Date.now();
+      chatMessages.innerHTML = `
+        <div class="chat-row assistant">
+          <div class="chat-bubble assistant">Lịch sử hội thoại đã được xóa thành công. Tôi có thể hỗ trợ gì thêm cho bạn?</div>
+        </div>
+      `;
+      scrollToBottom();
+    }
+
+    // Quick Portal Category Clicks
+    function askAICategory(category) {
+      if (!isChatOpen) toggleChatPanel();
+      
+      const prompts = {
+        "Biểu mẫu": "Cho tôi xin danh sách các biểu mẫu hành chính đang áp dụng tại trường",
+        "Đào tạo": "Quy chế đào tạo theo học chế tín chỉ của trường quy định như thế nào?",
+        "Công tác sinh viên": "Quy trình và điều kiện để xét nhận học bổng khuyến khích học tập là gì?",
+        "Danh bạ": "Tôi muốn tra cứu thông tin hiệu trưởng (số điện thoại, email)",
+        "Học liệu, truyền thông": "Quy trình đăng ký tài liệu giảng dạy và giáo trình học tập của trường",
+        "Khảo thí": "Các quy định về thi học phần, phúc khảo điểm thi và hoãn thi của trường",
+        "Quy định": "Hãy tóm tắt các quy định và hướng dẫn hành chính nội bộ mới nhất của nhà trường",
+        "Tài chính, kế toán": "Định mức thanh toán công tác phí và thủ tục đề nghị thanh toán là gì?",
+        "Văn thư, lưu trữ": "Quy định về việc lấy số hiệu công văn và trình ký văn bản hành chính"
+      };
+
+      chatInput.value = prompts[category] || `Tìm hiểu thông tin liên quan đến thư mục "${category}"`;
+      chatInput.style.height = "auto";
+      chatInput.style.height = chatInput.scrollHeight + "px";
+      chatSendBtn.disabled = false;
+      chatInput.focus();
+    }
+
+    // Search bar helper
+    function triggerSearchAI() {
+      const searchBox = document.getElementById("portalSearch");
+      const text = searchBox.value.trim();
+      if (!text) return;
+
+      if (!isChatOpen) toggleChatPanel();
+      chatInput.value = text;
+      chatInput.style.height = chatInput.scrollHeight + "px";
+      chatSendBtn.disabled = false;
+      searchBox.value = "";
+      sendMessage();
+    }
+  </script>
+</body>
+</html>
