@@ -121,7 +121,7 @@ const DocGenerator: React.FC = () => {
   const [copySuccess, setCopySuccess] = React.useState(false);
   const [insertSuccess, setInsertSuccess] = React.useState(false);
 
-  const resultRef = React.useRef<HTMLTextAreaElement>(null);
+  const resultRef = React.useRef<HTMLDivElement>(null);
   const resultSectionRef = React.useRef<HTMLDivElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -135,12 +135,11 @@ const DocGenerator: React.FC = () => {
 
   /* ── Scroll result/error into view smoothly ── */
   React.useEffect(() => {
-    if (result && containerRef.current) {
-      const el = containerRef.current;
+    if (result && resultSectionRef.current) {
       setTimeout(() => {
-        el.scrollTo({
-          top: el.scrollHeight,
-          behavior: "smooth"
+        resultSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
         });
       }, 150);
     }
@@ -178,6 +177,48 @@ const DocGenerator: React.FC = () => {
     return msg;
   };
 
+  /* ── Clean HTML Markdown Wrapper ── */
+  const cleanHtml = (rawHtml: string): string => {
+    let clean = rawHtml.trim();
+    if (clean.startsWith("```html")) {
+      clean = clean.substring(7);
+    } else if (clean.startsWith("```")) {
+      clean = clean.substring(3);
+    }
+    if (clean.endsWith("```")) {
+      clean = clean.substring(0, clean.length - 3);
+    }
+    return clean.trim();
+  };
+  const insertHtmlToWord = async (htmlContent: string) => {
+    if (typeof Word === "undefined") return;
+    await Word.run(async (context) => {
+      const body = context.document.body;
+      
+      // Bước 1: Chèn HTML
+      body.clear();
+      body.insertHtml(htmlContent, Word.InsertLocation.start);
+      await context.sync();
+      
+      // Bước 2: Force override toàn bộ font sau khi chèn
+      // Lấy tất cả paragraphs và set lại font
+      const paragraphs = body.paragraphs;
+      paragraphs.load("items");
+      await context.sync();
+      
+      paragraphs.items.forEach((p) => {
+        p.font.name = "Times New Roman";
+        p.font.size = 13;
+      });
+      
+      // Bước 3: Set font cho toàn body làm fallback
+      body.font.name = "Times New Roman";
+      body.font.size = 13;
+      
+      await context.sync();
+    });
+  };
+
   /* ── Submit: Form mode ── */
   const handleSubmitForm = async () => {
     setIsGenerating(true);
@@ -194,7 +235,19 @@ const DocGenerator: React.FC = () => {
         throw new Error(errBody.error || `Lỗi server ${response.status}`);
       }
       const data = await response.json();
-      setResult(data.result);
+      const cleaned = cleanHtml(data.result);
+      setResult(cleaned);
+
+      // Tự động chèn vào Word khi tạo thành công
+      if (typeof Word !== "undefined") {
+        try {
+          await insertHtmlToWord(cleaned);
+          setInsertSuccess(true);
+          setTimeout(() => setInsertSuccess(false), 2500);
+        } catch (wordErr) {
+          console.error("Lỗi tự động chèn vào Word:", wordErr);
+        }
+      }
     } catch (err: any) {
       setError(getFriendlyError(err));
     } finally {
@@ -219,7 +272,19 @@ const DocGenerator: React.FC = () => {
         throw new Error(errBody.error || `Lỗi server ${response.status}`);
       }
       const data = await response.json();
-      setResult(data.result);
+      const cleaned = cleanHtml(data.result);
+      setResult(cleaned);
+
+      // Tự động chèn vào Word khi tạo thành công
+      if (typeof Word !== "undefined") {
+        try {
+          await insertHtmlToWord(cleaned);
+          setInsertSuccess(true);
+          setTimeout(() => setInsertSuccess(false), 2500);
+        } catch (wordErr) {
+          console.error("Lỗi tự động chèn vào Word:", wordErr);
+        }
+      }
     } catch (err: any) {
       setError(getFriendlyError(err));
     } finally {
@@ -231,10 +296,7 @@ const DocGenerator: React.FC = () => {
   const handleInsertToWord = async () => {
     if (!result) return;
     try {
-      await Word.run(async (context) => {
-        context.document.body.insertText(result, Word.InsertLocation.end);
-        await context.sync();
-      });
+      await insertHtmlToWord(result);
       setInsertSuccess(true);
       setTimeout(() => setInsertSuccess(false), 2500);
     } catch (err) {
@@ -247,14 +309,22 @@ const DocGenerator: React.FC = () => {
   const handleCopy = async () => {
     if (!result) return;
     try {
-      await navigator.clipboard.writeText(result);
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = result;
+      const plainText = tempDiv.innerText || tempDiv.textContent || result;
+      await navigator.clipboard.writeText(plainText);
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2500);
     } catch {
       // Fallback for older browsers
       if (resultRef.current) {
-        resultRef.current.select();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(resultRef.current);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
         document.execCommand("copy");
+        selection?.removeAllRanges();
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2500);
       }
@@ -572,7 +642,7 @@ const DocGenerator: React.FC = () => {
       {/* ── Success Banner (Top) ── */}
       {result && (
         <div className="dg-success-banner">
-          🎉 Tạo văn bản thành công! Kết quả ở phía dưới.
+          🎉 Đã tạo văn bản thành công và tự động chèn vào Word! Bạn có thể xem chi tiết hoặc sao chép ở phía dưới.
         </div>
       )}
 
@@ -663,11 +733,27 @@ const DocGenerator: React.FC = () => {
           <div className="dg-result-header">
             <span className="dg-result-title">📄 Kết quả</span>
           </div>
-          <textarea
+          <div
             ref={resultRef}
-            className="dg-result-textarea"
-            value={result}
-            onChange={(e) => setResult(e.target.value)}
+            className="dg-result-preview"
+            contentEditable
+            suppressContentEditableWarning
+            onInput={(e) => setResult(e.currentTarget.innerHTML)}
+            dangerouslySetInnerHTML={{ __html: result }}
+            style={{
+              width: "100%",
+              minHeight: "250px",
+              maxHeight: "450px",
+              overflowY: "auto",
+              padding: "16px",
+              border: "none",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              lineHeight: "1.6",
+              outline: "none",
+              background: "var(--card)",
+              boxSizing: "border-box"
+            }}
           />
           <div className="dg-result-actions">
             <button
