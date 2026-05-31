@@ -52,7 +52,7 @@ graph TD
 
     %% Vector Database
     subgraph DB [Cơ sở dữ liệu Supabase]
-        PgVector[(pgvector - match_documents)]
+        PgVector[(pgvector + FTS - hybrid_search)]
     end
 
     %% Connections
@@ -82,9 +82,14 @@ graph TD
 * **Đặc tính:** Chuyển đổi các đoạn văn bản (chunks) từ quy chế của trường thành các vector toán học **768 chiều** và lưu trữ trong cơ sở dữ liệu Supabase hỗ trợ tiện ích mở rộng `pgvector`.
 * **Lý do duy trì model:** Dữ liệu quy chế nội bộ đã được cấu trúc và index trước bằng model `gemini-embedding-001` trong database. Việc giữ nguyên model này đảm bảo tính tương thích và độ chính xác tối đa khi so khớp vector.
 
-### 2. Tìm kiếm Tương tự (Vector Similarity Match)
-* Gọi trực tiếp hàm RPC `match_documents` trong Supabase để tính toán khoảng cách Cosine giữa Vector câu hỏi và cơ sở dữ liệu.
-* Bộ lọc ngưỡng chính xác `match_threshold: 0.3` giúp lọc bỏ các nhiễu thông tin không liên quan.
+### 2. Tìm kiếm Kết hợp Hybrid Search & Thuật toán Xếp hạng RRF (Reciprocal Rank Fusion)
+Hệ thống nâng cấp quy trình truy xuất tài liệu từ Vector Search thuần túy lên mô hình **Hybrid Search**, giúp tối ưu hóa cả khả năng hiểu ngữ nghĩa và tính chính xác tuyệt đối khi tìm từ khóa cụ thể (mã văn bản, tên phòng ban, chức vụ...):
+* **Full-Text Search (FTS) tích hợp:** Bổ sung cột dữ liệu `tsvector` cho các đoạn văn bản kèm chỉ mục GIN trong PostgreSQL, tự động đồng bộ hóa thông tin thông qua trigger database. Sử dụng cấu hình `'simple'` để xử lý tiếng Việt hiệu quả không phụ thuộc từ điển phân tách từ phức tạp.
+* **Xếp hạng bằng Reciprocal Rank Fusion (RRF):** Kết hợp kết quả từ hai kênh tìm kiếm:
+  1. **Vector Search:** Tính khoảng cách Cosine giữa vector truy vấn và embedding của tài liệu.
+  2. **BM25 Search:** Tính điểm tương quan từ khóa thông qua hàm xếp hạng văn bản `ts_rank_cd`.
+  Kế thừa thuật toán RRF với tham số mặc định $k = 60$ để chấm điểm tổng hợp, đưa các tài liệu có thứ hạng cao ở cả hai phương pháp lên đầu tiên.
+* **RPC Function (`hybrid_search`):** Truy xuất thông qua một store procedure duy nhất trên Supabase giúp giảm thiểu độ trễ kết nối, trả về kết quả xếp hạng tối ưu kèm điểm tương đồng `similarity`, thứ hạng `bm25_rank` và điểm tổng hợp `rrf_score`.
 
 ### 3. Thuật toán Ưu tiên đặc biệt cho "Danh bạ nhân sự" (Contact Priority Rule)
 Để giải quyết bài toán thông tin danh bạ thay đổi nhanh và yêu cầu tính chính xác tuyệt đối (không được phép sinh ảo giác AI về số điện thoại, chức vụ của Hiệu trưởng, Trưởng phòng...), hệ thống tích hợp bộ lọc logic thông minh:
@@ -134,6 +139,9 @@ graph TD
        });
      }, 150);
      ```
+5. **Bộ lọc làm sạch dữ liệu đầu ra và tự động định dạng (Gemini HTML Guardrails):**
+   * *Hiện tượng:* LLM thi thoảng sinh ra kết quả thô kèm mã bao bọc markdown ```html ... ```, chứa các thẻ HTML cấu trúc toàn trang dư thừa (`<html>`, `<head>`, `<body>`), hoặc vẫn sử dụng cú pháp markdown `**text**` không được MS Word Add-in nhận diện làm đậm trực tiếp.
+   * *Giải pháp:* Xây dựng hàm `sanitizeHtmlOutput()` trên backend để tự động loại bỏ các khối code block markdown, làm sạch các thẻ bao ngoài dư thừa, chuyển đổi động các ký tự markdown định dạng `**` -> `<strong>` và `*` -> `<em>`, đồng thời bao bọc kết quả trong một thẻ `div` wrapper với định dạng CSS chuẩn quốc gia (`font-family: Times New Roman`, `font-size: 13pt`, `line-height: 1.5`), giúp văn bản chèn vào Microsoft Word luôn đạt tính thẩm mỹ cao nhất và đúng thể thức văn thư hành chính.
 
 ---
 
@@ -149,7 +157,10 @@ graph TD
    cd server
    npm install
    ```
-2. Tạo file `.env` dựa theo file `.env.example` và cấu hình các khóa chính:
+2. Cài đặt các cơ sở dữ liệu trên Supabase SQL Editor. Chạy tuần tự các script trong thư mục [server/sql](file:///d:/CNTT-DHBK/HK6/QLDA/Office%20Buddy/OfficeBuddy/server/sql):
+   * [01_migration_fts.sql](file:///d:/CNTT-DHBK/HK6/QLDA/Office%20Buddy/OfficeBuddy/server/sql/01_migration_fts.sql): Thiết lập cột tìm kiếm Full-Text Search và Triggers tự động cập nhật.
+   * [02_rpc_hybrid_search.sql](file:///d:/CNTT-DHBK/HK6/QLDA/Office%20Buddy/OfficeBuddy/server/sql/02_rpc_hybrid_search.sql): Khởi tạo hàm RPC `hybrid_search` để thực hiện xếp hạng kết hợp RRF.
+3. Tạo file `.env` dựa theo file `.env.example` và cấu hình các khóa chính:
    ```env
    PORT=8000
    CLIENT_URL=https://localhost:3000
@@ -162,7 +173,7 @@ graph TD
    # Google Gemini API Key
    GEMINI_API_KEY=AIzaSy...
    ```
-3. Chạy server ở chế độ phát triển:
+4. Chạy server ở chế độ phát triển:
    ```bash
    npm run dev
    ```

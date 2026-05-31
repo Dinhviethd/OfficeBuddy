@@ -5,8 +5,11 @@ import { AppDataSource } from "@/configs/database.config";
 import { User } from "@/modules/auth/entities/user.model";
 import dotenv from "dotenv"
 dotenv.config()
+
 interface JwtPayload {
   userId: string;
+  email: string;
+  role: string;
 }
 
 declare global {
@@ -17,9 +20,9 @@ declare global {
   }
 }
 
+// ─── Middleware 1: Bắt buộc đăng nhập (mọi role) ─────────────
 export const authMiddleware = (
   req: Request,
-  
   res: Response,
   next: NextFunction
 ) => {
@@ -37,9 +40,11 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, secret) as JwtPayload;
 
-  req.user = {
-    userId: decoded.userId
-  };
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+    };
 
     next();
   } catch (error: any) {
@@ -51,6 +56,27 @@ export const authMiddleware = (
       next(error);
     }
   }
+};
+
+// Alias cho rõ nghĩa
+export const requireAuth = authMiddleware;
+
+// ─── Middleware 2: Chỉ admin mới qua được ─────────────────────
+export const requireAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // Trước tiên phải qua auth check
+  authMiddleware(req, res, (err?: any) => {
+    if (err) return next(err);
+
+    if (!req.user || req.user.role !== "admin") {
+      return next(new AppError(403, "Bạn không có quyền truy cập tài nguyên này. Yêu cầu quyền Admin."));
+    }
+
+    next();
+  });
 };
 
 export const checkAccountStatus = async (

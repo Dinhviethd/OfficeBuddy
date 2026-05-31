@@ -21,6 +21,10 @@ interface RetrievedChunk {
   folder: string;
   category: string;
   similarity: number;
+  bm25_rank: number;
+  rrf_score: number;
+  uploaded_at?: string;       // thêm mới
+  file_description?: string;  // thêm mới
 }
 
 interface ChatResult {
@@ -120,10 +124,14 @@ CÁC QUY TẮC LAYOUT:
   </tr>
 </table>
 
-QUY TẮC TUYỆT ĐỐI:
-- Placeholder chưa có thông tin: chỉ dùng <strong>[...]</strong>
-- Không dùng float, position:absolute, column-count
 - Dữ liệu người dùng đã được chuẩn hóa sẵn, dùng nguyên không sửa lại
+
+QUY TẮC PHÂN BIỆT THÔNG TIN CŨ/MỚI (RAG METADATA):
+Mỗi tài liệu có metadata gồm tên file, mô tả và ngày upload.
+Khi nhiều tài liệu cùng đề cập một thông tin:
+- Ưu tiên tài liệu có ngày upload MỚI NHẤT
+- Nếu tài liệu mới không đề cập thông tin cụ thể nào đó, có thể tham khảo tài liệu cũ nhưng phải ghi rõ "(theo [tên file], [ngày])"
+- Tuyệt đối không trộn lẫn thông tin từ 2 phiên bản khác nhau mà không chú thích nguồn
 `;
 
 // ─── TÌM KIẾM TRONG SUPABASE ─────────────────────────────────
@@ -135,13 +143,14 @@ async function retrieve(
   const result = await embedModel.embedContent(query);
   const queryEmbedding = result.embedding.values;
 
-  const { data, error } = await supabase.rpc("match_documents", {
+  const { data, error } = await supabase.rpc("hybrid_search", {
+    query_text: query,
     query_embedding: queryEmbedding,
-    match_threshold: 0.3,
     match_count: categoryFilter ? 100 : topK,
+    rrf_k: 60,
   });
 
-  if (error) throw new Error(`Supabase query lỗi: ${error.message}`);
+  if (error) throw new Error(`Supabase hybrid search lỗi: ${error.message}`);
 
   let chunks: RetrievedChunk[] = data ?? [];
 
@@ -181,7 +190,7 @@ async function ragChat(
     }
   }
 
-  const relevantChunks = chunks.filter((c) => c.similarity > 0.25);
+  const relevantChunks = chunks.filter((c) => c.similarity > 0.25 || c.rrf_score > 0);
 
   let ragContext = "";
   if (relevantChunks.length > 0) {
@@ -189,8 +198,13 @@ async function ragChat(
       "=== TÀI LIỆU THAM KHẢO ===\n" +
       relevantChunks
         .map(
-          (c, i) =>
-            `[TÀI LIỆU ${i + 1}]\n- Thư mục: ${c.folder}\n- Tên file nguồn: ${c.source}\n- Nội dung:\n${c.content}`
+          (c, i) => `[TÀI LIỆU ${i + 1}]
+- Thư mục: ${c.folder}
+- File: ${c.source}
+- Mô tả: ${c.file_description || "Không có mô tả"}
+- Ngày upload: ${c.uploaded_at ? new Date(c.uploaded_at).toLocaleDateString("vi-VN") : "Không rõ"}
+- Nội dung:
+${c.content}`
         )
         .join("\n\n---\n\n");
   }
@@ -218,7 +232,13 @@ Quan trọng:
 - Khi có nhiều nguồn mâu thuẫn nhau, ưu tiên thông tin từ thư mục "Danh bạ" (file "DanhBa_DUT_edited.xlsx")
 - Khi trả lời về nhân sự, CHỈ lấy từ thư mục "Danh bạ", bỏ qua các văn bản khác
 - Trích dẫn nguồn cụ thể sau mỗi thông tin
-- Nếu không tìm thấy trong tài liệu, nói rõ không có trong kho dữ liệu`,
+- Nếu không tìm thấy trong tài liệu, nói rõ không có trong kho dữ liệu
+
+Mỗi tài liệu có metadata gồm tên file, mô tả và ngày upload.
+Khi nhiều tài liệu cùng đề cập một thông tin:
+- Ưu tiên tài liệu có ngày upload MỚI NHẤT
+- Nếu tài liệu mới không đề cập thông tin cụ thể nào đó, có thể tham khảo tài liệu cũ nhưng phải ghi rõ "(theo [tên file], [ngày])"
+- Tuyệt đối không trộn lẫn thông tin từ 2 phiên bản khác nhau mà không chú thích nguồn`,
         },
       ],
     },
@@ -245,6 +265,51 @@ Quan trọng:
 
 function clearChatHistory(sessionId: string): void {
   chatHistories.delete(sessionId);
+}
+
+// ─── GUARDRAILS: LÀM SẠCH OUTPUT CỦA GEMINI ─────────────────
+const REQUIRED_WRAPPER_STYLE =
+  `font-family:'Times New Roman',Times,serif;font-size:13pt;line-height:1.5;color:#000000`;
+
+function sanitizeHtmlOutput(raw: string): string {
+  let html = raw;
+  let modified = false;
+
+  // 1. Xóa code fence ```html ... ``` hoặc ``` ... ```
+  if (/^\s*```(?:html)?\s*\n/i.test(html)) {
+    html = html.replace(/^\s*```(?:html)?\s*\n/i, "").replace(/\n\s*```\s*$/i, "");
+    modified = true;
+  }
+
+  // 2. Xóa thẻ <html>, <head>, <body> thừa (giữ nội dung bên trong)
+  if (/<\/?(html|head|body)[^>]*>/i.test(html)) {
+    html = html.replace(/<\/?(html|head|body)[^>]*>/gi, "");
+    modified = true;
+  }
+
+  // 3. Đảm bảo có wrapper div với font-family Times New Roman
+  if (!html.includes(REQUIRED_WRAPPER_STYLE)) {
+    html = `<div style="${REQUIRED_WRAPPER_STYLE}">\n${html.trim()}\n</div>`;
+    modified = true;
+  }
+
+  // 4. Chuyển Markdown **text** → <strong>text</strong>
+  if (/\*\*(.+?)\*\*/.test(html)) {
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    modified = true;
+  }
+
+  // 5. Chuyển Markdown *text* → <em>text</em> (tránh match ** đã xử lý)
+  if (/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/.test(html)) {
+    html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
+    modified = true;
+  }
+
+  if (modified) {
+    console.warn("[Guardrails] Đã tự động sửa output của Gemini");
+  }
+
+  return html.trim();
 }
 
 // ─── SINH VĂN BẢN CÓ RAG ────────────────────────────────────
@@ -288,7 +353,7 @@ Yêu cầu: đủ Quốc hiệu, tiêu ngữ, số hiệu, ngày tháng, nội d
 ${HTML_LAYOUT_RULES}`;
 
   const result = await llmModel.generateContent(prompt);
-  return result.response.text();
+  return sanitizeHtmlOutput(result.response.text());
 }
 
 async function ragGenerateFromFreeText(request: string): Promise<string> {
@@ -310,7 +375,7 @@ Hãy:
 ${HTML_LAYOUT_RULES}`;
 
   const result = await llmModel.generateContent(prompt);
-  return result.response.text();
+  return sanitizeHtmlOutput(result.response.text());
 }
 
 export {

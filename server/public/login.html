@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - eOffice DUT</title>
+  <meta name="description" content="Trang đăng nhập hệ thống hành chính điện tử eOffice DUT">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0078d4;
+      --primary-hover: #005a9e;
+      --primary-glow: rgba(0, 120, 212, 0.3);
+      --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-main: #ffffff;
+      --text-muted: #b0c4de;
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-border: rgba(255, 255, 255, 0.15);
+      --error-color: #ff4d4d;
+      --success-color: #2ed573;
+      --radius-lg: 24px;
+      --radius-md: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Background Blobs */
+    .ambient-blob {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.4;
+      animation: float-blob 20s infinite alternate;
+    }
+
+    .blob-1 {
+      background: #0078d4;
+      top: -100px;
+      left: -100px;
+    }
+
+    .blob-2 {
+      background: #00a2ed;
+      bottom: -150px;
+      right: -100px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float-blob {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, 30px) scale(1.15); }
+    }
+
+    /* Form Container (Glass Card) */
+    .login-container {
+      background: var(--card-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--card-border);
+      width: 100%;
+      max-width: 480px;
+      padding: 50px 40px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      position: relative;
+      animation: card-appear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes card-appear {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      font-size: 36px;
+      background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 120, 212, 0.4);
+    }
+
+    .brand-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #b0c4de 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+    }
+
+    .header-desc {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .header-desc h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .header-desc p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Message Alerts */
+    .alert {
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: alert-slide-down 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid transparent;
+    }
+
+    .alert-error {
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--error-color);
+      border-color: rgba(255, 77, 77, 0.2);
+    }
+
+    .alert-success {
+      background: rgba(46, 213, 115, 0.1);
+      color: var(--success-color);
+      border-color: rgba(46, 213, 115, 0.2);
+    }
+
+    .alert-hidden {
+      display: none !important;
+    }
+
+    @keyframes alert-slide-down {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px 14px 44px;
+      font-size: 15px;
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .form-input:focus + .input-icon {
+      color: var(--primary);
+    }
+
+    /* Extra Actions */
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      font-size: 13.5px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .remember-me input {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .forgot-link:hover {
+      color: #00a2ed;
+      text-decoration: underline;
+    }
+
+    /* Button */
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 120, 212, 0.3);
+      transition: var(--transition);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 120, 212, 0.45);
+      background: linear-gradient(135deg, #0086f0 0%, #0066b3 100%);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Loader Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s infinite linear;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer Links */
+    .form-footer {
+      text-align: center;
+      margin-top: 35px;
+      font-size: 14px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 25px;
+    }
+
+    .register-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .register-link:hover {
+      color: #00a2ed;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Blobs -->
+  <div class="ambient-blob blob-1"></div>
+  <div class="ambient-blob blob-2"></div>
+
+  <!-- Form Card -->
+  <div class="login-container">
+    <div class="brand-logo">
+      <div class="logo-icon">🏢</div>
+      <div class="brand-name">eOffice DUT</div>
+    </div>
+
+    <div class="header-desc">
+      <h1>Chào mừng trở lại!</h1>
+      <p>Đăng nhập để truy cập cổng thông tin và chatbot AI</p>
+    </div>
+
+    <!-- Alert Messages -->
+    <div id="alertBox" class="alert alert-hidden">
+      <span id="alertIcon">⚠️</span>
+      <span id="alertMessage">Lỗi đăng nhập</span>
+    </div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="emailInput" class="form-label">Email cơ quan</label>
+        <div class="input-wrapper">
+          <input 
+            type="email" 
+            id="emailInput" 
+            class="form-input" 
+            placeholder="username@dut.udn.vn" 
+            required 
+            autocomplete="email"
+          >
+          <span class="input-icon">✉️</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="passwordInput" class="form-label">Mật khẩu</label>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            id="passwordInput" 
+            class="form-input" 
+            placeholder="••••••••" 
+            required 
+            autocomplete="current-password"
+          >
+          <span class="input-icon">🔒</span>
+        </div>
+      </div>
+
+      <!-- Extra Actions -->
+      <div class="form-actions">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe"> Nhớ mật khẩu
+        </label>
+        <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Quên mật khẩu?</a>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="submitBtn" class="submit-btn">
+        <span>ĐĂNG NHẬP</span>
+        <div id="btnSpinner" class="spinner"></div>
+      </button>
+    </form>
+
+    <div class="form-footer">
+      Bạn chưa có tài khoản? <a href="/register.html" class="register-link">Đăng ký ngay</a>
+    </div>
+  </div>
+
+  <script>
+    // Check if already logged in, redirect accordingly
+    window.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      if (token && role) {
+        if (role === 'admin') {
+          window.location.href = '/admin.html';
+        } else {
+          window.location.href = '/index.html';
+        }
+      }
+    });
+
+    const alertBox = document.getElementById('alertBox');
+    const alertMessage = document.getElementById('alertMessage');
+    const alertIcon = document.getElementById('alertIcon');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnSpinner = document.getElementById('btnSpinner');
+
+    function showAlert(type, message) {
+      alertBox.className = `alert alert-${type}`;
+      alertMessage.textContent = message;
+      alertIcon.textContent = type === 'success' ? '✅' : '⚠️';
+    }
+
+    function hideAlert() {
+      alertBox.classList.add('alert-hidden');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideAlert();
+
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+
+      // Visual loading state
+      submitBtn.disabled = true;
+      btnSpinner.style.display = 'block';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const resData = await response.json();
+
+        if (!response.ok) {
+          throw new Error(resData.message || 'Email hoặc mật khẩu không chính xác.');
+        }
+
+        showAlert('success', 'Đăng nhập thành công! Đang chuyển hướng...');
+        
+        // Save session items in localStorage
+        const authData = resData.data;
+        localStorage.setItem('token', authData.accessToken);
+        localStorage.setItem('role', authData.user.role);
+        localStorage.setItem('fullName', authData.user.fullName);
+        localStorage.setItem('email', authData.user.email);
+
+        setTimeout(() => {
+          if (authData.user.role === 'admin') {
+            window.location.href = '/admin.html';
+          } else {
+            window.location.href = '/index.html';
+          }
+        }, 1200);
+
+      } catch (error) {
+        console.error('Login error:', error);
+        showAlert('error', error.message);
+        submitBtn.disabled = false;
+        btnSpinner.style.display = 'none';
+      }
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      showAlert('success', 'Chức năng khôi phục mật khẩu qua OTP đã sẵn sàng trên hệ thống. Vui lòng liên hệ quản trị viên hoặc sử dụng API reset-password.');
+    }
+  </script>
+</body>
+</html>

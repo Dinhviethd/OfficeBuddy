@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - eOffice DUT</title>
+  <meta name="description" content="Hệ thống quản trị tài liệu và cấu hình RAG - eOffice DUT">
+  <!-- Google Fonts: Outfit & Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0078d4;
+      --primary-hover: #005a9e;
+      --primary-light: #f0f6fd;
+      --bg-dark: #0f172a;
+      --bg-light: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 2px 10px rgba(0,0,0,0.04);
+      --shadow-md: 0 8px 30px rgba(0,0,0,0.06);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --transition: all 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── SIDEBAR ────────────────────────────────────────────── */
+    aside {
+      width: 280px;
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 24px;
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(15, 23, 42, 0.15);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .brand-icon {
+      font-size: 28px;
+      background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14.5px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-item.active a {
+      background-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(0, 120, 212, 0.3);
+    }
+
+    .nav-item-icon {
+      font-size: 18px;
+    }
+
+    .user-card {
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .user-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .user-role {
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .logout-btn:hover {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    /* ─── MAIN CONTENT AREA ──────────────────────────────────── */
+    main {
+      margin-left: 280px;
+      padding: 40px 50px;
+      flex: 1;
+      max-width: 1400px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 35px;
+    }
+
+    .header-left h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--bg-dark);
+      margin-bottom: 6px;
+    }
+
+    .header-left p {
+      font-size: 14.5px;
+      color: var(--text-muted);
+    }
+
+    .quick-chat-link {
+      background-color: var(--card-bg);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .quick-chat-link:hover {
+      background-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-info h4 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .stat-info p {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--bg-dark);
+    }
+
+    .stat-icon {
+      font-size: 24px;
+      width: 52px;
+      height: 52px;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Content Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 32px;
+    }
+
+    /* Upload Zone Card */
+    .section-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+    }
+
+    .section-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--bg-dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropzone-container {
+      border: 2px dashed #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 40px 30px;
+      text-align: center;
+      background-color: #fafbfd;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 25px;
+    }
+
+    .dropzone-container:hover, .dropzone-container.drag-over {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .dropzone-icon {
+      font-size: 42px;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+    }
+
+    .dropzone-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .dropzone-text p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      background-color: #ffffff;
+      transition: var(--transition);
+    }
+
+    .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+    }
+
+    .upload-btn {
+      width: 100%;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
+      transition: var(--transition);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upload-btn:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 6px 18px rgba(0, 120, 212, 0.3);
+    }
+
+    /* List Table Card */
+    .file-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .file-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    .file-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 11.5px;
+      letter-spacing: 0.3px;
+    }
+
+    .file-table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    .file-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .file-name-cell {
+      font-weight: 600;
+      color: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-icon {
+      font-size: 18px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .badge-folder {
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+    }
+
+    .badge-success {
+      background-color: #ecfdf5;
+      color: #10b981;
+    }
+
+    .action-btn-delete {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 6px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .action-btn-delete:hover {
+      background-color: #fef2f2;
+    }
+
+    /* Upload Log / Tasks Panel */
+    .log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .log-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background-color: #fafbfc;
+      border: 1px solid var(--border-color);
+      font-size: 12.5px;
+    }
+
+    .log-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .log-text h5 {
+      font-weight: 600;
+      color: var(--bg-dark);
+      margin-bottom: 3px;
+    }
+
+    .log-text p {
+      color: var(--text-muted);
+    }
+
+    .log-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Visual toast notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      animation: toast-fade-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes toast-fade-in {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Access Control Script -->
+  <script>
+    // Access checking before rendering body
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const fullName = localStorage.getItem('fullName');
+
+    if (!token || role !== 'admin') {
+      // Not logged in or not admin, redirect to login page
+      window.location.href = '/login.html';
+    }
+  </script>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside>
+    <div class="brand-section">
+      <div class="brand-icon">🏢</div>
+      <div class="brand-title">Admin eOffice</div>
+    </div>
+
+    <ul class="nav-list">
+      <li class="nav-item active">
+        <a href="#">
+          <span class="nav-item-icon">📊</span>
+          <span>Tổng quan & Upload</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/index.html">
+          <span class="nav-item-icon">🤖</span>
+          <span>Chatbot Web Portal</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="user-card">
+      <div class="user-avatar" id="avatarName">AD</div>
+      <div class="user-info">
+        <div class="user-name" id="userNameLabel">Quản trị viên</div>
+        <div class="user-role">Quản trị hệ thống</div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()" title="Đăng xuất">
+        🚪
+      </button>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main>
+    <header>
+      <div class="header-left">
+        <h2>Tổng quan Hệ thống & Upload Tài liệu RAG</h2>
+        <p>Quản trị kho học liệu, quy định, biểu mẫu và đồng bộ Vector Database lên Supabase.</p>
+      </div>
+      <a href="/index.html" class="quick-chat-link">
+        <span>💬 Vào Chatbot AI</span>
+      </a>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Tổng số tài liệu</h4>
+          <p>42 văn bản</p>
+        </div>
+        <div class="stat-icon">📂</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Thư mục RAG</h4>
+          <p>9 danh mục</p>
+        </div>
+        <div class="stat-icon">📁</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Lượt chat (Hôm nay)</h4>
+          <p>128 yêu cầu</p>
+        </div>
+        <div class="stat-icon">💬</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Vector DB Status</h4>
+          <p>Đã đồng bộ</p>
+        </div>
+        <div class="stat-icon">⚡</div>
+      </div>
+    </div>
+
+    <!-- Content Columns -->
+    <div class="content-grid">
+      <!-- Left Column: Upload & Files -->
+      <div>
+        <!-- Upload Form -->
+        <div class="section-card">
+          <h3>📥 Upload Tài liệu mới vào RAG</h3>
+          
+          <div class="form-group">
+            <label for="categoryInput" class="form-label">Danh mục tài liệu RAG (Cho phép nhập danh mục mới)</label>
+            <input type="text" id="categoryInput" class="form-select" style="text-align: left; background-color: #ffffff;" placeholder="Ví dụ: bieu-mau, thong-bao, quy-che-moi, danh-ba...">
+          </div>
+
+          <div class="form-group">
+            <label for="adminNameInput" class="form-label">Họ tên Admin thực hiện</label>
+            <input type="text" id="adminNameInput" class="form-select" style="text-align: left; background-color: #ffffff;" placeholder="Nhập tên của bạn...">
+          </div>
+
+          <div class="form-group">
+            <label for="fileDescriptionInput" class="form-label">Mô tả nội dung file (Bắt buộc để LLM phân biệt cũ/mới)</label>
+            <textarea id="fileDescriptionInput" class="form-select" style="text-align: left; height: 80px; resize: none; background-color: #ffffff;" placeholder="Ví dụ: Quy chế đào tạo cập nhật học kỳ hè 2026, bổ sung phụ lục xếp loại tốt nghiệp mới nhất..."></textarea>
+          </div>
+
+          <!-- Drag and drop zone -->
+          <div 
+            id="dropzone" 
+            class="dropzone-container"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            <div class="dropzone-icon">☁️</div>
+            <div class="dropzone-text">
+              <h4>Kéo và thả file của bạn vào đây hoặc click để duyệt file</h4>
+              <p>Chấp nhận file định dạng PDF, DOCX, XLSX, TXT. Dung lượng tối đa 10MB.</p>
+            </div>
+            <input type="file" id="fileInput" style="display: none" accept=".docx,.xlsx,.pdf,.txt" onchange="handleFileSelect(event)">
+          </div>
+
+          <div id="fileSelectedDisplay" style="display: none; margin-bottom: 20px; font-size: 13.5px; background-color: var(--primary-light); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(0, 120, 212, 0.15);">
+            📄 Đã chọn file: <strong id="selectedFileName">document.docx</strong> (<span id="selectedFileSize">0 KB</span>)
+          </div>
+
+          <!-- Result Area -->
+          <div id="resultArea" style="display: none; margin-bottom: 20px; font-size: 13.5px; padding: 14px; border-radius: var(--radius-sm); border: 1px solid;"></div>
+
+          <button id="uploadBtn" class="upload-btn" onclick="triggerRealUpload()">
+            <span>BẮT ĐẦU UPLOAD & EMBEDDING RAG</span>
+          </button>
+        </div>
+
+        <!-- Files List -->
+        <div class="section-card">
+          <h3>📋 Danh sách tài liệu RAG đã đồng bộ</h3>
+          <div class="file-table-wrapper">
+            <table class="file-table">
+              <thead>
+                <tr>
+                  <th>Tên văn bản</th>
+                  <th>Danh mục RAG</th>
+                  <th>Trạng thái Vector</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="fileTableBody">
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">📄</span>
+                      <span>HD-thutuc-thanhtoan-congtacphi-2025.pdf</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Tài chính, kế toán</span></td>
+                  <td><span class="badge badge-success">Đã index (12 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'HD-thutuc-thanhtoan-congtacphi-2025.pdf')">🗑</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">📄</span>
+                      <span>Quy-dinh-xet-hoc-bong-KKHT-2025.docx</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Công tác sinh viên</span></td>
+                  <td><span class="badge badge-success">Đã index (8 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'Quy-dinh-xet-hoc-bong-KKHT-2025.docx')">🗑</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">📄</span>
+                      <span>QD-quyche-daotao-tinchi-DUT-K23.pdf</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Đào tạo</span></td>
+                  <td><span class="badge badge-success">Đã index (25 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'QD-quyche-daotao-tinchi-DUT-K23.pdf')">🗑</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">📄</span>
+                      <span>Mau-to-trinh-xin-kinh-phi-khoa.docx</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Biểu mẫu</span></td>
+                  <td><span class="badge badge-success">Đã index (4 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'Mau-to-trinh-xin-kinh-phi-khoa.docx')">🗑</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Operations / Logs -->
+      <div>
+        <div class="section-card">
+          <h3>📈 Tiến trình Xử lý RAG</h3>
+          <div class="log-list" id="logList">
+            <div class="log-item">
+              <div class="log-bullet"></div>
+              <div class="log-text">
+                <h5>Đồng bộ Vector Database hoàn tất</h5>
+                <p>Toàn bộ 42 văn bản đã được chunking và embedding lên database.</p>
+                <div class="log-time">10 phút trước</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-bullet"></div>
+              <div class="log-text">
+                <h5>Khởi tạo mô hình AI Gemini 2.5 thành công</h5>
+                <p>Đã thiết lập kết nối API Key và RAG retriever pipelines.</p>
+                <div class="log-time">30 phút trước</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-bullet" style="background-color: #eab308;"></div>
+              <div class="log-text">
+                <h5>Cấp tài khoản Admin mặc định</h5>
+                <p>Admin mặc định admin@dut.udn.vn đã hoạt động.</p>
+                <div class="log-time">1 giờ trước</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>⚙️ Cấu hình Mô hình RAG</h3>
+          <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px;">
+            Thiết lập các siêu tham số cho mô hình truy hồi thông tin và trả lời câu hỏi AI.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Mô hình AI sử dụng</label>
+            <select class="form-select" disabled>
+              <option>Gemini 2.5 Flash (Tối ưu RAG)</option>
+              <option>Gemini 2.5 Pro (Độ chính xác cao)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Chunk Size (Số ký tự/đoạn)</label>
+            <select class="form-select">
+              <option value="500">500 ký tự (Đoạn ngắn - chi tiết)</option>
+              <option value="1000" selected>1000 ký tự (Khuyên dùng)</option>
+              <option value="1500">1500 ký tự (Đoạn dài - đầy đủ ngữ cảnh)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Số đoạn văn truy hồi tối đa (K)</label>
+            <select class="form-select">
+              <option value="3">Top 3 đoạn tương đồng nhất</option>
+              <option value="5" selected>Top 5 đoạn tương đồng nhất (Khuyên dùng)</option>
+              <option value="8">Top 8 đoạn tương đồng nhất</option>
+            </select>
+          </div>
+
+          <button class="upload-btn" style="background-color: var(--bg-dark);" onclick="showToast('Cập nhật cấu hình mô hình AI thành công!')">
+            LƯU THIẾT LẬP CẤU HÌNH
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Toast -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    // Display logged in username
+    window.addEventListener('DOMContentLoaded', () => {
+      if (fullName) {
+        document.getElementById('userNameLabel').textContent = fullName;
+        
+        // Initials for avatar
+        const words = fullName.split(' ');
+        let initials = 'CB';
+        if (words.length > 0) {
+          initials = words[words.length - 1].substring(0, 2).toUpperCase();
+        }
+        document.getElementById('avatarName').textContent = initials;
+      }
+    });
+
+    // Toast message function
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `🔔 <span>${message}</span>`;
+      container.appendChild(toast);
+
+      // Auto remove toast
+      setTimeout(() => {
+        toast.style.animation = 'none';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    // Handle logout action
+    function handleLogout() {
+      localStorage.clear();
+      showToast('Đang đăng xuất khỏi hệ thống...');
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 1000);
+    }
+
+    // Mock interactive upload
+    let selectedFile = null;
+    const dropzone = document.getElementById('dropzone');
+    const fileSelectedDisplay = document.getElementById('fileSelectedDisplay');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const selectedFileSize = document.getElementById('selectedFileSize');
+
+    // Drag-over styling
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('drag-over');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('drag-over');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      
+      if (e.dataTransfer.files.length > 0) {
+        setFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files.length > 0) {
+        setFile(e.target.files[0]);
+      }
+    }
+
+    function setFile(file) {
+      selectedFile = file;
+      selectedFileName.textContent = file.name;
+      selectedFileSize.textContent = `${Math.round(file.size / 1024)} KB`;
+      fileSelectedDisplay.style.display = 'block';
+      showToast(`Đã chọn file: ${file.name}`);
+    }
+
+    async function triggerRealUpload() {
+      if (!selectedFile) {
+        showResult('error', 'Vui lòng kéo/thả hoặc chọn tài liệu cần upload trước.');
+        return;
+      }
+
+      const category = document.getElementById('categoryInput').value.trim();
+      const uploadedBy = document.getElementById('adminNameInput').value.trim();
+      const fileDescription = document.getElementById('fileDescriptionInput').value.trim();
+
+      if (!category) {
+        showResult('error', 'Vui lòng nhập danh mục tài liệu RAG.');
+        return;
+      }
+      if (!uploadedBy) {
+        showResult('error', 'Vui lòng điền họ tên admin thực hiện.');
+        return;
+      }
+      if (!fileDescription) {
+        showResult('error', 'Vui lòng điền mô tả tài liệu (Bắt buộc để LLM phân biệt cũ/mới).');
+        return;
+      }
+
+      const btn = document.getElementById('uploadBtn');
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Đang tải file lên & phân tích trích xuất chữ...';
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('category', category);
+      formData.append('uploadedBy', uploadedBy);
+      formData.append('fileDescription', fileDescription);
+
+      try {
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi xử lý upload từ server.');
+        }
+
+        // Show successful message
+        showResult('success', `Đăng tải thành công! File đã được embedding và lập chỉ mục RAG. Chunks đã chèn: ${data.chunksInserted}`);
+
+        // Add dynamically to file table
+        const tableBody = document.getElementById('fileTableBody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td>
+            <div class="file-name-cell">
+              <span class="file-icon">📄</span>
+              <span>${selectedFile.name}</span>
+            </div>
+          </td>
+          <td><span class="badge badge-folder">${category}</span></td>
+          <td><span class="badge badge-success">Đã index (${data.chunksInserted} chunks)</span></td>
+          <td>
+            <button class="action-btn-delete" title="Xóa tài liệu" onclick="this.closest('tr').remove(); showToast('Đã gỡ bản ghi tạm thời');">🗑</button>
+          </td>
+        `;
+        tableBody.insertBefore(newRow, tableBody.firstChild);
+
+        // Add dynamically to activity log
+        const logList = document.getElementById('logList');
+        const newLog = document.createElement('div');
+        newLog.className = 'log-item';
+        newLog.innerHTML = `
+          <div class="log-bullet"></div>
+          <div class="log-text">
+            <h5>Đã nạp văn bản "${selectedFile.name}" thành công</h5>
+            <p>Admin: ${uploadedBy}. Chunks: ${data.chunksInserted}. Mô tả: ${fileDescription}</p>
+            <div class="log-time">Vừa xong</div>
+          </div>
+        `;
+        logList.insertBefore(newLog, logList.firstChild);
+
+        showToast(`✅ Đã nạp thành công tài liệu RAG: ${selectedFile.name}`);
+
+        // Reset file inputs
+        selectedFile = null;
+        document.getElementById('fileInput').value = '';
+        document.getElementById('fileSelectedDisplay').style.display = 'none';
+        document.getElementById('fileDescriptionInput').value = '';
+
+      } catch (err) {
+        console.error('Real upload error:', err);
+        showResult('error', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>BẮT ĐẦU UPLOAD & EMBEDDING RAG</span>';
+      }
+    }
+
+    function showResult(type, message) {
+      const resultArea = document.getElementById('resultArea');
+      resultArea.style.display = 'block';
+      if (type === 'success') {
+        resultArea.style.backgroundColor = 'rgba(46, 213, 115, 0.1)';
+        resultArea.style.borderColor = 'rgba(46, 213, 115, 0.3)';
+        resultArea.style.color = '#2ed573';
+        resultArea.innerHTML = `✅ <strong>Thành công:</strong> ${message}`;
+      } else {
+        resultArea.style.backgroundColor = 'rgba(255, 77, 77, 0.1)';
+        resultArea.style.borderColor = 'rgba(255, 77, 77, 0.3)';
+        resultArea.style.color = '#ff4d4d';
+        resultArea.innerHTML = `❌ <strong>Lỗi:</strong> ${message}`;
+      }
+    }
+
+    function deleteMockFile(btn, name) {
+      if (confirm(`Bạn có chắc chắn muốn xóa tài liệu RAG "${name}"? Thao tác này sẽ xóa toàn bộ vectors liên quan trong database.`)) {
+        btn.closest('tr').remove();
+        showToast(`🗑 Đã gỡ bỏ tài liệu khỏi RAG: ${name}`);
+
+        // Add to log
+        const logList = document.getElementById('logList');
+        const newLog = document.createElement('div');
+        newLog.className = 'log-item';
+        newLog.innerHTML = `
+          <div class="log-bullet" style="background-color: #ef4444;"></div>
+          <div class="log-text">
+            <h5>Đã gỡ bỏ văn bản "${name}"</h5>
+            <p>Toàn bộ embeddings của tài liệu đã bị xóa khỏi cơ sở dữ liệu Vector.</p>
+            <div class="log-time">Vừa xong</div>
+          </div>
+        `;
+        logList.insertBefore(newLog, logList.firstChild);
+      }
+    }
+  </script>
+</body>
+</html>

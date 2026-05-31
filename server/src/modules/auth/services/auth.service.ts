@@ -26,23 +26,25 @@ export class AuthService {
 
   
   async register(input: RegisterInput): Promise<AuthResponse> {
-    const username = input.username.trim();
-    const { password } = input;
+    const email = input.email.trim().toLowerCase();
+    const { password, fullName } = input;
 
-    const existingUser = await this.userRepo.findByUsername(username);
+    const existingUser = await this.userRepo.findByEmail(email);
     if (existingUser) {
-      throw new AppError(400, 'Tên tài khoản đã được sử dụng');
+      throw new AppError(400, 'Email đã được sử dụng');
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await this.userRepo.create({
-      username,
+      email,
       password: hashedPassword,
+      fullName: fullName || '',
+      role: 'user',
     });
 
-    const tokens = this.generateTokens(newUser.idUser);
+    const tokens = this.generateTokens(newUser);
 
     return {
       user: this.toUserResponse(newUser),
@@ -51,20 +53,23 @@ export class AuthService {
   }
 
   async login(input: LoginInput): Promise<AuthResponse> {
-    const username = input.username.trim();
+    const email = input.email.trim().toLowerCase();
     const { password } = input;
 
-    const user = await this.userRepo.findByUsername(username);
+    const user = await this.userRepo.findByEmail(email);
     if (!user) {
-      throw new AppError(401, 'Tên tài khoản hoặc mật khẩu không chính xác');
+      throw new AppError(401, 'Email hoặc mật khẩu không chính xác');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new AppError(401, 'Tên tài khoản hoặc mật khẩu không chính xác');
+      throw new AppError(401, 'Email hoặc mật khẩu không chính xác');
     }
 
-    const tokens = this.generateTokens(user.idUser);
+    // Cập nhật last_login
+    await this.userRepo.updateLastLogin(user.idUser);
+
+    const tokens = this.generateTokens(user);
 
     return {
       user: this.toUserResponse(user),
@@ -89,7 +94,7 @@ export class AuthService {
       }
 
       
-      return this.generateTokens(user.idUser);
+      return this.generateTokens(user);
     } catch (error: any) {
       if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
         throw new AppError(401, 'Refresh token không hợp lệ hoặc đã hết hạn');
@@ -238,7 +243,7 @@ export class AuthService {
   }
 
   
-  private generateTokens(userId: string): { accessToken: string; refreshToken: string } {
+  private generateTokens(user: User): { accessToken: string; refreshToken: string } {
     const accessSecret = process.env.JWT_ACCESS_SECRET;
     const refreshSecret = process.env.JWT_REFRESH_SECRET;
 
@@ -246,17 +251,17 @@ export class AuthService {
       throw new Error('JWT secrets are not defined in environment');
     }
 
-    const accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
+    const accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || '8h';
     const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
     const accessToken = jwt.sign(
-      { userId },
+      { userId: user.idUser, email: user.email || '', role: user.role },
       accessSecret,
       { expiresIn: accessExpiresIn } as jwt.SignOptions
     );
 
     const refreshToken = jwt.sign(
-      { userId },
+      { userId: user.idUser },
       refreshSecret,
       { expiresIn: refreshExpiresIn } as jwt.SignOptions
     );
@@ -268,6 +273,9 @@ export class AuthService {
   private toUserResponse(user: User): UserResponse {
     return {
       idUser: user.idUser,
+      email: user.email || '',
+      role: user.role,
+      fullName: user.fullName,
       username: user.username,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

@@ -1,25 +1,27 @@
 import { z } from 'zod';
 
 export const registerSchema = z.object({
-  username: z
+  email: z
     .string()
-    .min(3, 'Tên tài khoản phải có ít nhất 3 ký tự')
-    .max(50, 'Tên tài khoản không được vượt quá 50 ký tự')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Tên tài khoản chỉ chứa chữ, số và dấu gạch dưới'),
+    .email('Email không hợp lệ'),
   password: z
     .string()
     .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
     .max(50, 'Mật khẩu không được vượt quá 50 ký tự'),
   confirmPassword: z.string(),
+  fullName: z
+    .string()
+    .min(1, 'Vui lòng nhập họ tên')
+    .max(100, 'Họ tên không được vượt quá 100 ký tự'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Mật khẩu xác nhận không khớp',
   path: ['confirmPassword'],
 });
 
 export const loginSchema = z.object({
-  username: z
+  email: z
     .string()
-    .min(1, 'Vui lòng nhập tên tài khoản'),
+    .email('Vui lòng nhập email hợp lệ'),
   password: z
     .string()
     .min(1, 'Vui lòng nhập mật khẩu'),
@@ -68,8 +70,11 @@ export const resetPasswordSchema = z.object({
 });
 
 export const createUserSchema = z.object({
-  username: z.string().min(3).max(50),
+  email: z.string().email(),
   password: z.string().min(6).max(255),
+  fullName: z.string().optional().default(''),
+  role: z.enum(['user', 'admin']).optional().default('user'),
+  username: z.string().optional(),
   resetOTP: z.string().optional(),
   resetOTPExpires: z.date().optional(),
 });
@@ -83,12 +88,15 @@ export const updateCurrentProfileSchema = z.object({
     .max(50, 'Tên tài khoản không được vượt quá 50 ký tự')
     .regex(/^[a-zA-Z0-9_]+$/, 'Tên tài khoản chỉ chứa chữ, số và dấu gạch dưới')
     .optional(),
+  fullName: z
+    .string()
+    .max(100, 'Họ tên không được vượt quá 100 ký tự')
+    .optional(),
 });
 
 export const uploadAvatarSchema = z.object({
   imageBase64: z.string().min(1, 'Ảnh đại diện là bắt buộc'),
 });
-
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại'),
@@ -119,7 +127,10 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 export type UserResponse = {
   idUser: string;
-  username: string;
+  email: string;
+  role: string;
+  fullName: string;
+  username?: string;
   createdAt: Date;
   updatedAt: Date;
 };

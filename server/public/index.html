@@ -1,12 +1,58 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+  <script>
+    // Immediate auth check to prevent FOUC (flash of unauthenticated content)
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>eOffice - Trường Đại học Bách Khoa - Đại học Đà Nẵng</title>
   <!-- Modern Segoe UI & Inter fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    .logout-btn-header {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      outline: none;
+    }
+    .logout-btn-header:hover {
+      background: rgba(255, 77, 77, 0.25);
+      border-color: rgba(255, 77, 77, 0.4);
+    }
+    .admin-btn-header {
+      background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+      border: none;
+      color: #ffffff !important;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(211, 84, 0, 0.35);
+    }
+    .admin-btn-header:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 15px rgba(211, 84, 0, 0.5);
+    }
     /* ─── DESIGN SYSTEM & VARS ──────────────────────────────── */
     :root {
       --primary-color: #0078d4;
@@ -711,9 +757,13 @@
         <p>Trường Đại học Bách Khoa - Đại học Đà Nẵng</p>
       </div>
     </div>
-    <div class="user-profile">
-      <span class="user-name">Cán bộ: Nguyễn Văn A</span>
-      <div class="user-avatar">CB</div>
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <a href="/admin.html" id="adminHeaderBtn" class="admin-btn-header" style="display: none;">🛠️ Admin Panel</a>
+      <div class="user-profile">
+        <span class="user-name" id="userNameHeader">Cán bộ: Nguyễn Văn A</span>
+        <div class="user-avatar" id="userAvatarHeader">CB</div>
+      </div>
+      <button class="logout-btn-header" onclick="handleLogoutHeader()">🚪 Đăng xuất</button>
     </div>
   </header>
 
@@ -909,15 +959,117 @@
   </div>
 
   <script>
+    // Load and verify logged in user information
+    window.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            window.location.href = '/login.html';
+            return;
+          }
+          throw new Error('Failed to fetch profile');
+        }
+
+        const resData = await response.json();
+        const user = resData.data;
+
+        // Sync local storage with fresh data
+        localStorage.setItem('fullName', user.fullName);
+        localStorage.setItem('role', user.role);
+        localStorage.setItem('email', user.email);
+
+        document.getElementById('userNameHeader').textContent = `Cán bộ: ${user.fullName}`;
+        
+        // Extract initials
+        const parts = user.fullName.split(' ');
+        let initials = 'CB';
+        if (parts.length > 0) {
+          const lastName = parts[parts.length - 1];
+          initials = lastName.substring(0, 2).toUpperCase();
+        }
+        document.getElementById('userAvatarHeader').textContent = initials;
+
+        // If role is admin, show the admin dashboard button
+        if (user.role === 'admin') {
+          document.getElementById('adminHeaderBtn').style.display = 'inline-flex';
+        }
+
+        // Load saved chat history from sessionStorage if exists
+        loadChatHistory();
+      } catch (err) {
+        console.error('Session verification failed:', err);
+        // Stale or invalid token - clean up and redirect
+        localStorage.clear();
+        window.location.href = '/login.html';
+      }
+    });
+
+    function handleLogoutHeader() {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    }
+
     // ─── STATE MANAGEMENT ─────────────────────────────────────
     let isChatOpen = false;
-    let sessionId = "session_portal_" + Date.now();
+    
+    // Load or initialize chat session ID and history
+    let sessionId = sessionStorage.getItem('chat_session_id');
+    if (!sessionId) {
+      sessionId = "session_portal_" + Date.now();
+      sessionStorage.setItem('chat_session_id', sessionId);
+      
+      const welcomeText = "Xin chào! Tôi là Trợ lý eOffice AI của Trường ĐH Bách Khoa - ĐHĐN. Tôi có thể giúp bạn tra cứu quy định học tập, tài chính, biểu mẫu hành chính hoặc thông tin liên lạc của trường. Bạn cần tôi hỗ trợ thông tin gì hôm nay?";
+      const initialHistory = [{ role: "assistant", content: welcomeText, sources: null }];
+      sessionStorage.setItem('chat_history', JSON.stringify(initialHistory));
+    }
+
     const API_BASE = "/api/ai"; // Served directly from same host/port!
 
     const chatPanel = document.getElementById("chatPanel");
     const chatMessages = document.getElementById("chatMessages");
     const chatInput = document.getElementById("chatInput");
     const chatSendBtn = document.getElementById("chatSendBtn");
+
+    // Helper functions for sessionStorage R/W
+    function getChatHistory() {
+      const saved = sessionStorage.getItem('chat_history');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Error parsing chat history:", e);
+          return [];
+        }
+      }
+      return [];
+    }
+
+    function saveChatHistory(history) {
+      sessionStorage.setItem('chat_history', JSON.stringify(history));
+    }
+
+    function loadChatHistory() {
+      const history = getChatHistory();
+      if (history.length > 0) {
+        chatMessages.innerHTML = '';
+        history.forEach(msg => {
+          appendMessageDOM(msg.role, msg.content, msg.sources);
+        });
+      }
+    }
 
     // Enable/disable send button based on text input
     chatInput.addEventListener("input", function() {
@@ -954,8 +1106,8 @@
       }
     }
 
-    // Add bubble in the chat view
-    function appendMessage(role, content, sources = null) {
+    // Add bubble in the chat view (DOM only)
+    function appendMessageDOM(role, content, sources = null) {
       const rowDiv = document.createElement("div");
       rowDiv.className = `chat-row ${role}`;
       
@@ -994,6 +1146,17 @@
       }
 
       scrollToBottom();
+    }
+
+    // Add bubble in the chat view and save to session storage
+    function appendMessage(role, content, sources = null) {
+      // 1. Render in DOM
+      appendMessageDOM(role, content, sources);
+      
+      // 2. Save to sessionStorage history
+      const history = getChatHistory();
+      history.push({ role: role, content: content, sources: sources });
+      saveChatHistory(history);
     }
 
     // Show dynamic thinking loading indicator
@@ -1043,7 +1206,10 @@
       try {
         const response = await fetch(`${API_BASE}/chat`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
+          },
           body: JSON.stringify({
             sessionId: sessionId,
             message: text
@@ -1051,6 +1217,11 @@
         });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            window.location.href = '/login.html';
+            return;
+          }
           throw new Error("Lỗi kết nối máy chủ");
         }
 
@@ -1066,19 +1237,34 @@
       }
     }
 
-    // Clear session history
     async function clearHistory() {
       try {
-        await fetch(`${API_BASE}/chat/${sessionId}`, { method: "DELETE" });
+        const response = await fetch(`${API_BASE}/chat/${sessionId}`, { 
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
+          }
+        });
+        if (response.status === 401) {
+          localStorage.clear();
+          window.location.href = '/login.html';
+          return;
+        }
       } catch (err) {
         console.error("Error clearing chat session:", err);
       }
       
       // Reset variables
       sessionId = "session_portal_" + Date.now();
+      sessionStorage.setItem('chat_session_id', sessionId);
+      
+      const clearMsgText = "Lịch sử hội thoại đã được xóa thành công. Tôi có thể hỗ trợ gì thêm cho bạn?";
+      const initialHistory = [{ role: "assistant", content: clearMsgText, sources: null }];
+      sessionStorage.setItem('chat_history', JSON.stringify(initialHistory));
+
       chatMessages.innerHTML = `
         <div class="chat-row assistant">
-          <div class="chat-bubble assistant">Lịch sử hội thoại đã được xóa thành công. Tôi có thể hỗ trợ gì thêm cho bạn?</div>
+          <div class="chat-bubble assistant">${clearMsgText}</div>
         </div>
       `;
       scrollToBottom();

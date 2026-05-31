@@ -25,6 +25,9 @@ const DOC_TYPES: DocTypeDef[] = [
     fields: [
       { key: "hoTen", label: "Họ và tên", placeholder: "VD: Nguyễn Văn A" },
       { key: "maSV", label: "Mã số sinh viên", placeholder: "VD: 102210001" },
+      { key: "ngaySinh", label: "Ngày sinh", placeholder: "VD: 01/01/2003" },
+      { key: "noiSinh", label: "Nơi sinh", placeholder: "VD: Đà Nẵng" },
+      { key: "gioiTinh", label: "Giới tính", placeholder: "VD: Nam / Nữ" },
       { key: "lop", label: "Lớp sinh hoạt", placeholder: "VD: 21T1" },
       { key: "khoa", label: "Khoa quản lý", placeholder: "VD: Công nghệ thông tin" },
       { key: "khoaHocGDQP", label: "Khóa học quân sự", placeholder: "VD: Khóa 256 năm 2023 tại Trung tâm GDQP-AN" },
@@ -38,7 +41,9 @@ const DOC_TYPES: DocTypeDef[] = [
     fields: [
       { key: "hoTen", label: "Họ và tên", placeholder: "VD: Nguyễn Văn A" },
       { key: "maSV", label: "Mã số sinh viên", placeholder: "VD: 102210001" },
+      { key: "ngaySinh", label: "Ngày sinh", placeholder: "VD: 01/01/2003" },
       { key: "lop", label: "Lớp sinh hoạt", placeholder: "VD: 21T1" },
+      { key: "khoa", label: "Khoa quản lý", placeholder: "VD: Công nghệ thông tin" },
       { key: "chungChi", label: "Chứng chỉ ngoại ngữ", placeholder: "VD: IELTS 6.5 / TOEIC 700..." },
       { key: "diemChungChi", label: "Điểm số/Kết quả", placeholder: "VD: 6.5" },
       { key: "hocPhanMien", label: "Các học phần xin miễn", placeholder: "VD: Anh văn 1, Anh văn 2, Anh văn 3", multiline: true },
@@ -51,6 +56,7 @@ const DOC_TYPES: DocTypeDef[] = [
     fields: [
       { key: "hoTen", label: "Họ và tên", placeholder: "VD: Nguyễn Văn A" },
       { key: "maSV", label: "Mã số sinh viên", placeholder: "VD: 102210001" },
+      { key: "ngaySinh", label: "Ngày sinh", placeholder: "VD: 01/01/2003" },
       { key: "lop", label: "Lớp sinh hoạt", placeholder: "VD: 21T1" },
       { key: "khoa", label: "Khoa quản lý", placeholder: "VD: Công nghệ thông tin" },
       { key: "thoiGianHoan", label: "Thời gian hoãn (Học kỳ)", placeholder: "VD: Học kỳ 1 năm học 2025-2026" },
@@ -64,7 +70,9 @@ const DOC_TYPES: DocTypeDef[] = [
     fields: [
       { key: "hoTen", label: "Họ và tên", placeholder: "VD: Nguyễn Văn A" },
       { key: "maSV", label: "Mã số sinh viên", placeholder: "VD: 102210001" },
+      { key: "ngaySinh", label: "Ngày sinh", placeholder: "VD: 01/01/2003" },
       { key: "lop", label: "Lớp sinh hoạt", placeholder: "VD: 21T1" },
+      { key: "khoa", label: "Khoa quản lý", placeholder: "VD: Công nghệ thông tin" },
       { key: "nganhHienTai", label: "Ngành đào tạo hiện tại", placeholder: "VD: Kỹ sư Công nghệ thông tin (KS)" },
       { key: "nganhMuonChuyen", label: "Ngành/Chương trình muốn chuyển", placeholder: "VD: Cử nhân Công nghệ thông tin (CN-KS2)" },
       { key: "lyDo", label: "Lý do xin chuyển", placeholder: "Trình bày nguyện vọng, lý do chuyển ngành...", multiline: true },
@@ -77,7 +85,9 @@ const DOC_TYPES: DocTypeDef[] = [
     fields: [
       { key: "hoTen", label: "Họ và tên", placeholder: "VD: Nguyễn Văn A" },
       { key: "maSV", label: "Mã số sinh viên", placeholder: "VD: 102210001" },
+      { key: "ngaySinh", label: "Ngày sinh", placeholder: "VD: 01/01/2003" },
       { key: "lop", label: "Lớp sinh hoạt", placeholder: "VD: 21T1" },
+      { key: "khoa", label: "Khoa quản lý", placeholder: "VD: Công nghệ thông tin" },
       { key: "soTien", label: "Số tiền học phí xin gia hạn", placeholder: "VD: 12.500.000 VNĐ" },
       { key: "hocKy", label: "Gia hạn cho học kỳ", placeholder: "VD: Học kỳ 2 năm học 2025-2026" },
       { key: "thoiGianGiaHan", label: "Thời hạn cam kết hoàn thành", placeholder: "VD: cam kết nộp trước ngày 30/06/2026" },
@@ -91,11 +101,22 @@ const DOC_TYPES: DocTypeDef[] = [
     fields: [
       { key: "hoTen", label: "Họ và tên", placeholder: "VD: Nguyễn Văn A" },
       { key: "maSV", label: "Mã số sinh viên", placeholder: "VD: 102210001" },
+      { key: "ngaySinh", label: "Ngày sinh", placeholder: "VD: 01/01/2003" },
+      { key: "noiSinh", label: "Nơi sinh", placeholder: "VD: Đà Nẵng" },
+      { key: "gioiTinh", label: "Giới tính", placeholder: "VD: Nam / Nữ" },
       { key: "lop", label: "Lớp sinh hoạt", placeholder: "VD: 21T1" },
       { key: "khoa", label: "Khoa quản lý", placeholder: "VD: Công nghệ thông tin" },
       { key: "tichLuy", label: "Số tín chỉ tích lũy", placeholder: "VD: 154 tín chỉ" },
       { key: "tbTL", label: "Điểm trung bình tích lũy", placeholder: "VD: 3.25 (Thang 4)" },
       { key: "ngay", label: "Ngày làm đơn", placeholder: "VD: 31/05/2026" },
+    ],
+  },
+  {
+    value: "other",
+    label: "Loại văn bản khác...",
+    fields: [
+      { key: "customDocType", label: "Tên loại văn bản cần sinh", placeholder: "VD: Đơn xin rút học phần, Tờ trình mua thiết bị..." },
+      { key: "customDescription", label: "Mô tả thông tin chi tiết", placeholder: "Nhập các thông tin cần thiết (Lý do, danh sách, yêu cầu cụ thể...)", multiline: true },
     ],
   },
 ];
@@ -219,17 +240,33 @@ const DocGenerator: React.FC = () => {
     });
   };
 
-  /* ── Submit: Form mode ── */
   const handleSubmitForm = async () => {
     setIsGenerating(true);
     setError("");
     setResult("");
     try {
-      const response = await fetch(`${API_BASE_URL}/ai/generate/form`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ docType: selectedType, formData }),
-      });
+      let response;
+      if (selectedType === "other") {
+        const customType = formData["customDocType"] || "";
+        const customDesc = formData["customDescription"] || "";
+        if (!customType.trim()) {
+          throw new Error("Vui lòng nhập tên loại văn bản cần sinh");
+        }
+        if (!customDesc.trim()) {
+          throw new Error("Vui lòng nhập mô tả thông tin chi tiết");
+        }
+        response = await fetch(`${API_BASE_URL}/ai/generate/free`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ request: `Hãy soạn thảo: ${customType}. Chi tiết và các thông tin đi kèm: ${customDesc}` }),
+        });
+      } else {
+        response = await fetch(`${API_BASE_URL}/ai/generate/form`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ docType: selectedType, formData }),
+        });
+      }
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}));
         throw new Error(errBody.error || `Lỗi server ${response.status}`);
