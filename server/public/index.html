@@ -11,65 +11,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>eOffice - Trường Đại học Bách Khoa - Đại học Đà Nẵng</title>
-  <!-- Modern Segoe UI & Inter fonts -->
+  <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    .logout-btn-header {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      outline: none;
-    }
-    .logout-btn-header:hover {
-      background: rgba(255, 77, 77, 0.25);
-      border-color: rgba(255, 77, 77, 0.4);
-    }
-    .admin-btn-header {
-      background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-      border: none;
-      color: #ffffff !important;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      box-shadow: 0 4px 10px rgba(211, 84, 0, 0.35);
-    }
-    .admin-btn-header:hover {
-      transform: translateY(-1.5px);
-      box-shadow: 0 6px 15px rgba(211, 84, 0, 0.5);
-    }
-    /* ─── DESIGN SYSTEM & VARS ──────────────────────────────── */
     :root {
-      --primary-color: #0078d4;
-      --primary-hover: #005a9e;
-      --primary-light: #f0f6fd;
-      --bg-dark: #1b1b1b;
-      --bg-light: #f3f5f8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg-color: #fafafa;
       --card-bg: #ffffff;
-      --text-main: #242424;
-      --text-muted: #595959;
-      --border-color: #e0e0e0;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-      --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
-      --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
-      --radius-sm: 6px;
+      --text-main: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.05), 0 1px 8px rgba(0,0,0,0.02);
+      --radius-sm: 8px;
       --radius-md: 12px;
-      --radius-lg: 20px;
+      --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * {
@@ -79,22 +40,22 @@
     }
 
     body {
-      font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
-      background-color: var(--bg-light);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-color);
       color: var(--text-main);
-      line-height: 1.6;
+      line-height: 1.5;
       overflow-x: hidden;
     }
 
     /* ─── HEADER ────────────────────────────────────────────── */
     header {
-      background: linear-gradient(135deg, #0a3663 0%, #0078d4 100%);
-      color: #ffffff;
-      padding: 16px 40px;
+      background-color: #ffffff;
+      color: var(--text-main);
+      padding: 14px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: var(--shadow-sm);
+      border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -103,65 +64,107 @@
     .logo-container {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
-    .logo-icon {
-      font-size: 32px;
-      background: rgba(255,255,255,0.15);
-      width: 50px;
-      height: 50px;
+    .logo-icon-container {
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: var(--radius-md);
-      box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+      background-color: rgba(37, 99, 235, 0.05);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      color: var(--primary);
     }
 
     .header-text h1 {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
     }
 
     .header-text p {
       font-size: 12px;
-      opacity: 0.85;
+      color: var(--text-secondary);
       font-weight: 400;
     }
 
     .user-profile {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: rgba(255,255,255,0.1);
-      padding: 6px 16px;
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,0.15);
+      gap: 10px;
+      background: #f9fafb;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
     }
 
     .user-avatar {
-      width: 28px;
-      height: 28px;
-      background-color: #ffffff;
-      color: var(--primary-color);
+      width: 26px;
+      height: 26px;
+      background-color: var(--primary);
+      color: #ffffff;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
+      font-weight: 600;
+      font-size: 12px;
     }
 
     .user-name {
       font-size: 13px;
       font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .logout-btn-header {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: var(--transition);
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logout-btn-header:hover {
+      background-color: #fef2f2;
+      border-color: #fca5a5;
+      color: #ef4444;
+    }
+
+    .admin-btn-header {
+      background-color: var(--primary);
+      border: none;
+      color: #ffffff !important;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .admin-btn-header:hover {
+      background-color: var(--primary-hover);
     }
 
     /* ─── MAIN LAYOUT ───────────────────────────────────────── */
     main {
-      max-width: 1300px;
+      max-width: 1200px;
       margin: 40px auto;
       padding: 0 24px;
       display: grid;
@@ -171,10 +174,10 @@
 
     /* ─── PORTAL HOME CONTENT ────────────────────────────────── */
     .portal-section-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       margin-bottom: 20px;
-      color: #0a3663;
+      color: var(--text-main);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -182,15 +185,15 @@
 
     .search-wrapper {
       background: var(--card-bg);
-      padding: 24px;
-      border-radius: var(--radius-md);
+      padding: 28px;
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow-sm);
       margin-bottom: 32px;
-      border: 1px solid rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
     }
 
     .search-wrapper h2 {
-      font-size: 16px;
+      font-size: 15px;
       margin-bottom: 12px;
       font-weight: 600;
       color: var(--text-main);
@@ -205,29 +208,29 @@
       flex: 1;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      padding: 12px 16px;
+      padding: 10px 14px;
       font-size: 14px;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: var(--transition);
     }
 
     .search-input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-glow);
     }
 
     .search-btn {
-      background-color: var(--primary-color);
+      background-color: var(--primary);
       color: #ffffff;
       border: none;
-      padding: 0 24px;
+      padding: 0 20px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13.5px;
       border-radius: var(--radius-sm);
       cursor: pointer;
       font-family: inherit;
-      transition: background-color 0.2s;
+      transition: var(--transition);
     }
 
     .search-btn:hover {
@@ -237,30 +240,30 @@
     /* Category Grid */
     .category-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
       margin-bottom: 40px;
     }
 
     .category-card {
       background: var(--card-bg);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       padding: 24px;
       text-align: left;
-      border: 1px solid rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
-      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      transition: var(--transition);
       cursor: pointer;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 160px;
+      height: 150px;
     }
 
     .category-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-md);
-      border-color: var(--primary-color);
+      border-color: var(--primary);
     }
 
     .category-card-top {
@@ -270,60 +273,60 @@
     }
 
     .category-icon {
-      font-size: 26px;
-      background-color: var(--primary-light);
-      width: 46px;
-      height: 46px;
+      background-color: rgba(37, 99, 235, 0.05);
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: var(--radius-sm);
-      color: var(--primary-color);
+      color: var(--primary);
     }
 
     .category-card h3 {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 600;
       color: var(--text-main);
-      margin-top: 14px;
+      margin-top: 12px;
+      letter-spacing: -0.01em;
     }
 
     .category-card p {
       font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
+      color: var(--text-secondary);
+      margin-top: 3px;
     }
 
     /* ─── SIDEBAR ───────────────────────────────────────────── */
     .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
     .sidebar-card {
       background: var(--card-bg);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       padding: 24px;
       box-shadow: var(--shadow-sm);
-      border: 1px solid rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
     }
 
     .sidebar-card h3 {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      color: #0a3663;
-      margin-bottom: 16px;
-      border-bottom: 2px solid var(--primary-light);
-      padding-bottom: 8px;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-
 
     /* ─── FLOATING CHAT ASSISTANT WIDGET ─────────────────────── */
     .chat-bubble-container {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
+      bottom: 24px;
+      right: 24px;
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -332,64 +335,33 @@
 
     /* Floating Bubble Button */
     .chat-bubble-btn {
-      width: 60px;
-      height: 60px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+      background: var(--primary);
       color: #ffffff;
-      box-shadow: 0 4px 16px rgba(0, 120, 212, 0.4);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
       cursor: pointer;
-      transition: transform 0.25s, box-shadow 0.25s;
+      transition: var(--transition);
       border: none;
       position: relative;
     }
 
     .chat-bubble-btn:hover {
-      transform: scale(1.08) rotate(5deg);
-      box-shadow: 0 6px 20px rgba(0, 120, 212, 0.55);
-    }
-
-    /* Bouncing Ring Pulse Animation */
-    .chat-bubble-btn::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 2px solid var(--primary-color);
-      top: -2px;
-      left: -2px;
-      box-shadow: 0 0 8px var(--primary-color);
-      animation: bubble-pulse 2s infinite;
-      pointer-events: none;
-    }
-
-    @keyframes bubble-pulse {
-      0% {
-        transform: scale(0.95);
-        opacity: 0.8;
-      }
-      70% {
-        transform: scale(1.3);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(0.95);
-        opacity: 0;
-      }
+      transform: scale(1.05);
+      background-color: var(--primary-hover);
     }
 
     .chat-tooltip {
       position: absolute;
-      right: 76px;
-      top: 15px;
-      background-color: var(--bg-dark);
+      right: 64px;
+      top: 13px;
+      background-color: var(--text-main);
       color: #ffffff;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: var(--radius-sm);
       font-size: 12px;
       font-weight: 500;
@@ -397,8 +369,8 @@
       box-shadow: var(--shadow-sm);
       pointer-events: none;
       opacity: 0;
-      transform: translateX(10px);
-      transition: opacity 0.3s, transform 0.3s;
+      transform: translateX(6px);
+      transition: var(--transition);
     }
 
     .chat-bubble-container:hover .chat-tooltip {
@@ -409,23 +381,24 @@
     /* Expanded Chat Panel */
     .chat-panel {
       position: fixed;
-      bottom: 105px;
-      right: 30px;
-      width: 400px;
-      height: 600px;
+      bottom: 90px;
+      right: 24px;
+      width: 600px;
+      height: 780px;
+      max-height: calc(100vh - 140px);
       background: var(--card-bg);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow-lg);
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       z-index: 1001;
-      transform: scale(0.8) translateY(50px);
+      transform: scale(0.95) translateY(20px);
       opacity: 0;
       pointer-events: none;
       transform-origin: bottom right;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+      transition: var(--transition);
     }
 
     .chat-panel.active {
@@ -436,9 +409,10 @@
 
     /* Chat Header */
     .chat-header {
-      background: linear-gradient(135deg, #0a3663 0%, #0078d4 100%);
-      color: #ffffff;
-      padding: 16px 20px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 14px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -452,10 +426,10 @@
     }
 
     .chat-header-icon {
-      font-size: 20px;
-      background-color: rgba(255,255,255,0.18);
-      width: 38px;
-      height: 38px;
+      background-color: rgba(37, 99, 235, 0.05);
+      color: var(--primary);
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -463,13 +437,15 @@
     }
 
     .chat-header-title h4 {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
     }
 
     .chat-header-title p {
-      font-size: 10px;
-      opacity: 0.85;
+      font-size: 10.5px;
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -478,39 +454,37 @@
     .chat-header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .chat-btn-action {
       background: none;
       border: none;
-      color: #ffffff;
-      font-size: 16px;
+      color: var(--text-secondary);
       cursor: pointer;
-      opacity: 0.8;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      transition: background-color 0.2s, opacity 0.2s;
+      transition: var(--transition);
     }
 
     .chat-btn-action:hover {
-      background-color: rgba(255,255,255,0.12);
-      opacity: 1;
+      background-color: #f3f4f6;
+      color: var(--text-main);
     }
 
     /* Chat Messages Box */
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
-      background-color: #f7f9fb;
+      padding: 16px;
+      background-color: #fafafa;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .chat-row {
@@ -529,7 +503,7 @@
     .chat-bubble {
       max-width: 85%;
       padding: 10px 14px;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
       font-size: 13.5px;
       line-height: 1.5;
       white-space: pre-wrap;
@@ -540,7 +514,7 @@
     @keyframes bubble-fade {
       from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(6px);
       }
       to {
         opacity: 1;
@@ -549,29 +523,29 @@
     }
 
     .chat-bubble.user {
-      background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+      background: var(--primary);
       color: #ffffff;
       border-bottom-right-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,120,212,0.18);
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.15);
     }
 
     .chat-bubble.assistant {
       background-color: #ffffff;
       color: var(--text-main);
       border-bottom-left-radius: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
     }
 
     /* Citations / Sources block */
     .chat-sources-block {
       margin-top: 6px;
       background: #ffffff;
-      border: 1px solid #eef1f5;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 10px;
-      font-size: 11.5px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+      font-size: 11px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.01);
       width: 100%;
       box-sizing: border-box;
       min-width: 0;
@@ -580,7 +554,7 @@
 
     .chat-sources-header {
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -592,10 +566,14 @@
       justify-content: space-between;
       align-items: center;
       padding: 3px 0;
-      color: #6a7b8c;
-      border-bottom: 1px dashed #f0f3f6;
+      color: var(--text-secondary);
+      border-bottom: 1px dashed var(--border-color);
       gap: 8px;
       min-width: 0;
+    }
+
+    .chat-source-item:last-child {
+      border-bottom: none;
     }
 
     .chat-source-item span:first-child {
@@ -606,16 +584,12 @@
       min-width: 0;
     }
 
-    .chat-source-item:last-child {
-      border-bottom: none;
-    }
-
     .chat-source-sim {
-      background-color: #f0f6fd;
-      color: var(--primary-color);
-      padding: 1px 5px;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      padding: 1px 4px;
       border-radius: 3px;
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 600;
     }
 
@@ -624,16 +598,16 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 16px;
+      padding: 10px 14px;
       background-color: #ffffff;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
       border-bottom-left-radius: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
       font-size: 12.5px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       width: fit-content;
-      animation: bubble-fade 0.25s ease-out;
+      animation: bubble-fade 0.2s ease-out;
     }
 
     .chat-thinking-dots {
@@ -642,10 +616,10 @@
     }
 
     .chat-thinking-dot {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
-      background-color: #999;
+      background-color: #9ca3af;
       animation: bouncing-dot 1.2s infinite;
     }
 
@@ -658,22 +632,56 @@
         opacity: 0.3;
       }
       50% {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
         opacity: 1;
       }
     }
 
-    /* Chat Input Panel */
+    /* Chat Input Panel & Chips */
     .chat-input-wrapper {
-      padding: 14px 18px;
+      padding: 12px 16px 14px;
       background-color: #ffffff;
       border-top: 1px solid var(--border-color);
       flex-shrink: 0;
     }
 
+    /* Scrollable Suggestion Chips Row */
+    .chat-chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none;  /* IE/Edge */
+    }
+
+    .chat-chips-row::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    .chat-chip {
+      background-color: #f3f4f6;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .chat-chip:hover {
+      background-color: var(--primary-light);
+      border-color: rgba(37, 99, 235, 0.2);
+      color: var(--primary);
+    }
+
     .chat-input-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: flex-end;
     }
 
@@ -681,51 +689,51 @@
       flex: 1;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 10px 14px;
+      padding: 8px 12px;
       font-size: 13.5px;
       line-height: 1.4;
       font-family: inherit;
       resize: none;
       outline: none;
-      max-height: 100px;
-      background-color: #fafafa;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      max-height: 90px;
+      background-color: #f9fafb;
+      transition: var(--transition);
     }
 
     .chat-textarea:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
       background-color: #ffffff;
     }
 
     .chat-send-btn {
-      background-color: var(--primary-color);
+      background-color: var(--primary);
       color: #ffffff;
       border: none;
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
+      transition: var(--transition);
       flex-shrink: 0;
     }
 
     .chat-send-btn:hover:not(:disabled) {
       background-color: var(--primary-hover);
-      transform: translateY(-1px);
     }
 
     .chat-send-btn:disabled {
-      background-color: #cccccc;
+      background-color: #e5e7eb;
+      color: var(--text-muted);
       cursor: not-allowed;
     }
 
     .chat-input-hint {
-      font-size: 10px;
-      color: var(--text-muted);
+      font-size: 9.5px;
+      color: var(--text-secondary);
       margin-top: 6px;
       text-align: right;
     }
@@ -759,19 +767,34 @@
   <!-- ─── HEADER ─── -->
   <header>
     <div class="logo-container">
-      <div class="logo-icon">🏢</div>
+      <div class="logo-icon-container">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
       <div class="header-text">
         <h1>eOFFICE - Hệ thống Hành chính điện tử</h1>
         <p>Trường Đại học Bách Khoa - Đại học Đà Nẵng</p>
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 14px;">
-      <a href="/admin.html" id="adminHeaderBtn" class="admin-btn-header" style="display: none;">🛠️ Admin Panel</a>
+      <a href="/admin.html" id="adminHeaderBtn" class="admin-btn-header" style="display: none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Admin Panel</span>
+      </a>
       <div class="user-profile">
         <span class="user-name" id="userNameHeader">Nguyễn Văn A</span>
         <div class="user-avatar" id="userAvatarHeader">CB</div>
       </div>
-      <button class="logout-btn-header" onclick="handleLogoutHeader()">🚪 Đăng xuất</button>
+      <button class="logout-btn-header" onclick="handleLogoutHeader()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+        <span>Đăng xuất</span>
+      </button>
     </div>
   </header>
 
@@ -788,13 +811,26 @@
         </div>
       </div>
 
-      <h2 class="portal-section-title">📁 Kho tài liệu & Quy trình eOffice</h2>
+      <h2 class="portal-section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Kho tài liệu & Quy trình eOffice</span>
+      </h2>
       
       <!-- Category Grid matching the 9 RAG folders -->
       <div class="category-grid">
         <div class="category-card" onclick="askAICategory('Biểu mẫu')">
           <div class="category-card-top">
-            <div class="category-icon">📋</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Biểu mẫu</h3>
@@ -804,7 +840,14 @@
 
         <div class="category-card" onclick="askAICategory('Công tác sinh viên')">
           <div class="category-card-top">
-            <div class="category-icon">👥</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Công tác sinh viên</h3>
@@ -814,7 +857,11 @@
 
         <div class="category-card" onclick="askAICategory('Danh bạ')">
           <div class="category-card-top">
-            <div class="category-icon">📞</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Danh bạ</h3>
@@ -824,7 +871,12 @@
 
         <div class="category-card" onclick="askAICategory('Đào tạo')">
           <div class="category-card-top">
-            <div class="category-icon">🎓</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Đào tạo</h3>
@@ -834,7 +886,13 @@
 
         <div class="category-card" onclick="askAICategory('Học liệu, truyền thông')">
           <div class="category-card-top">
-            <div class="category-icon">📢</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                <path d="M12 8v4"/>
+                <path d="M12 16h.01"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Học liệu & Truyền thông</h3>
@@ -844,7 +902,12 @@
 
         <div class="category-card" onclick="askAICategory('Khảo thí')">
           <div class="category-card-top">
-            <div class="category-icon">✍️</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Khảo thí</h3>
@@ -854,7 +917,14 @@
 
         <div class="category-card" onclick="askAICategory('Quy định')">
           <div class="category-card-top">
-            <div class="category-icon">📜</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Quy định</h3>
@@ -864,7 +934,13 @@
 
         <div class="category-card" onclick="askAICategory('Tài chính, kế toán')">
           <div class="category-card-top">
-            <div class="category-icon">💰</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <line x1="12" y1="4" x2="12" y2="20"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Tài chính & Kế toán</h3>
@@ -874,7 +950,11 @@
 
         <div class="category-card" onclick="askAICategory('Văn thư, lưu trữ')">
           <div class="category-card-top">
-            <div class="category-icon">📂</div>
+            <div class="category-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
           </div>
           <div>
             <h3>Văn thư & Lưu trữ</h3>
@@ -887,11 +967,18 @@
     <!-- Right column: Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-card">
-        <h3>💡 Tính năng nổi bật</h3>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Tính năng nổi bật</span>
+        </h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
           Hệ thống eOffice trường ĐHBK Đà Nẵng đã tích hợp <strong>Trợ lý ảo AI</strong> sử dụng công nghệ RAG + Gemini 2.5 Flash.
         </p>
-        <p style="font-size: 13px; color: var(--text-muted);">
+        <p style="font-size: 13px; color: var(--text-secondary);">
           Bấm vào biểu tượng chatbot ở góc phải màn hình để hỏi đáp nhanh quy chế học tập, biểu mẫu hành chính, danh bạ liên lạc!
         </p>
       </div>
@@ -904,22 +991,40 @@
     <div class="chat-tooltip">Hỏi Trợ lý ảo eOffice AI</div>
     
     <!-- Bubble trigger button -->
-    <button class="chat-bubble-btn" id="chatTriggerBtn" onclick="toggleChatPanel()">🤖</button>
+    <button class="chat-bubble-btn" id="chatTriggerBtn" onclick="toggleChatPanel()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </button>
 
     <!-- Chat Panel -->
     <div class="chat-panel" id="chatPanel">
       <!-- Header -->
       <div class="chat-header">
         <div class="chat-header-info">
-          <div class="chat-header-icon">🤖</div>
+          <div class="chat-header-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
           <div class="chat-header-title">
             <h4>Trợ lý ảo AI - eOffice DUT</h4>
-            <p><span style="color: #4cd137;">●</span> Hoạt động • Hỗ trợ RAG</p>
+            <p><span style="color: #22c55e;">●</span> Hoạt động • Hỗ trợ RAG</p>
           </div>
         </div>
         <div class="chat-header-actions">
-          <button class="chat-btn-action" title="Xóa lịch sử chat" onclick="clearHistory()">🗑</button>
-          <button class="chat-btn-action" title="Đóng" onclick="toggleChatPanel()">✕</button>
+          <button class="chat-btn-action" title="Xóa lịch sử chat" onclick="clearHistory()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+          <button class="chat-btn-action" title="Đóng" onclick="toggleChatPanel()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -932,12 +1037,21 @@
 
       <!-- Input Panel -->
       <div class="chat-input-wrapper">
+        <!-- Scrollable Suggestion Chips Row -->
+        <div class="chat-chips-row">
+          <button class="chat-chip" onclick="askAICategory('Biểu mẫu')">📋 Mẫu đơn</button>
+          <button class="chat-chip" onclick="askAICategory('Đào tạo')">🎓 Quy chế học</button>
+          <button class="chat-chip" onclick="askAICategory('Công tác sinh viên')">👥 Học bổng</button>
+          <button class="chat-chip" onclick="askAICategory('Danh bạ')">📞 Điện thoại</button>
+          <button class="chat-chip" onclick="askAICategory('Tài chính, kế toán')">💰 Công tác phí</button>
+        </div>
+
         <div class="chat-input-row">
           <textarea class="chat-textarea" id="chatInput" placeholder="Nhập câu hỏi của bạn..." rows="1" onkeydown="handleInputKeyDown(event)"></textarea>
           <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()" disabled>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>
           </button>
         </div>
@@ -1094,6 +1208,49 @@
       }
     }
 
+    function parseMarkdown(text) {
+      if (!text) return "";
+      // Escape HTML to prevent XSS
+      let html = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // Bold: **text** or __text__
+      html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      html = html.replace(/__(.*?)__/g, "<strong>$1</strong>");
+
+      // Inline code: `code`
+      html = html.replace(/`(.*?)`/g, '<code style="background-color: rgba(37,99,235,0.06); color: var(--primary); padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; font-weight: 600;">$1</code>');
+
+      // Lists: split by line and convert lines starting with * or - to <li>
+      const lines = html.split("\n");
+      let inList = false;
+      let resultLines = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith("* ") || line.startsWith("- ")) {
+          if (!inList) {
+            inList = true;
+            resultLines.push('<ul style="margin: 6px 0 6px 16px; padding-left: 0; list-style-type: disc;">');
+          }
+          resultLines.push(`<li style="margin-bottom: 4px;">${line.substring(2)}</li>`);
+        } else {
+          if (inList) {
+            inList = false;
+            resultLines.push("</ul>");
+          }
+          resultLines.push(lines[i]);
+        }
+      }
+      if (inList) {
+        resultLines.push("</ul>");
+      }
+
+      return resultLines.join("<br>");
+    }
+
     // Add bubble in the chat view (DOM only)
     function appendMessageDOM(role, content, sources = null) {
       const rowDiv = document.createElement("div");
@@ -1101,7 +1258,12 @@
       
       const bubbleDiv = document.createElement("div");
       bubbleDiv.className = `chat-bubble ${role}`;
-      bubbleDiv.textContent = content;
+      
+      if (role === "assistant") {
+        bubbleDiv.innerHTML = parseMarkdown(content);
+      } else {
+        bubbleDiv.textContent = content;
+      }
       
       rowDiv.appendChild(bubbleDiv);
       chatMessages.appendChild(rowDiv);

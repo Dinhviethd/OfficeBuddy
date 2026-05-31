@@ -1,55 +1,78 @@
 import * as React from "react";
 import { AuthService, LoginRequest } from "../services/authService";
 
+/* ─── Shared Styles ───────────────────────────────────────── */
 const styles = {
   container: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     minHeight: "100vh",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#FAFAFA",
     padding: "20px",
-    fontFamily: "'Source Sans 3', sans-serif",
+    fontFamily: "'Inter', -apple-system, sans-serif",
+    boxSizing: "border-box",
   } as React.CSSProperties,
   box: {
-    backgroundColor: "white",
-    padding: "40px",
-    borderRadius: "8px",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-    maxWidth: "400px",
+    backgroundColor: "#FFFFFF",
+    padding: "32px 28px",
+    borderRadius: "16px",
+    border: "1px solid #E5E7EB",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.01)",
+    maxWidth: "360px",
     width: "100%",
+    boxSizing: "border-box",
+  } as React.CSSProperties,
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    marginBottom: "16px",
+  } as React.CSSProperties,
+  logoIcon: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#2563EB",
+    background: "rgba(37, 99, 235, 0.08)",
+    width: "36px",
+    height: "36px",
+    borderRadius: "8px",
   } as React.CSSProperties,
   title: {
     textAlign: "center" as const,
-    color: "#1f4d7a",
-    fontSize: "28px",
+    color: "#111827",
+    fontSize: "20px",
     fontWeight: "700",
-    margin: "0 0 10px 0",
+    letterSpacing: "-0.022em",
+    margin: "0",
   },
   subtitle: {
     textAlign: "center" as const,
-    color: "#66747f",
-    fontSize: "18px",
-    fontWeight: "600",
-    margin: "0 0 30px 0",
+    color: "#6B7280",
+    fontSize: "13.5px",
+    fontWeight: "400",
+    margin: "6px 0 24px 0",
+    lineHeight: "1.4",
   },
   label: {
     display: "block",
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "#1f2933",
-    marginBottom: "5px",
+    fontSize: "12.5px",
+    fontWeight: "500",
+    color: "#374151",
+    marginBottom: "6px",
   },
 };
 
+/* ─── Register Component ───────────────────────────────────── */
 interface RegisterProps {
   onRegisterSuccess: (user: any) => void;
   onBackToLogin: () => void;
 }
 
 const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin }) => {
-  console.log("Register component rendering");
-  
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
@@ -60,7 +83,6 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin })
     e.preventDefault();
     setError("");
 
-    // Validate
     if (password !== confirmPassword) {
       setError("Mật khẩu xác nhận không khớp");
       return;
@@ -79,19 +101,12 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin })
     setIsLoading(true);
 
     try {
-      console.log("Attempting registration with:", { username });
       const response = await AuthService.register({
         username,
         password,
         confirmPassword,
       });
-      console.log("Registration response:", response);
-
-      // Save tokens
       AuthService.saveTokens(response.data.accessToken, response.data.refreshToken);
-      console.log("Tokens saved, calling success callback");
-
-      // Call the success callback
       onRegisterSuccess(response.data.user);
     } catch (err: any) {
       console.error("Registration error:", err);
@@ -105,89 +120,120 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin })
     <div style={styles.container}>
       <style>
         {`
-          @import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap");
+          @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
           
-          .register-form {
-            font-family: 'Source Sans 3', sans-serif;
+          .auth-input-group {
+            margin-bottom: 16px;
           }
           
-          .register-input {
+          .auth-input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 14px;
+            padding: 10px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            color: #111827;
+            background-color: #FCFCFC;
             box-sizing: border-box;
-          }
-          
-          .register-input:focus {
             outline: none;
-            border-color: #1f4d7a;
-            box-shadow: 0 0 0 2px rgba(31, 77, 122, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           }
           
-          .register-button {
+          .auth-input::placeholder {
+            color: #9CA3AF;
+          }
+          
+          .auth-input:focus {
+            border-color: #2563EB;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+          }
+          
+          .auth-button {
             width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background-color: #1f4d7a;
+            padding: 11px;
+            margin-top: 8px;
+            background-color: #2563EB;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 16px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           }
           
-          .register-button:hover:not(:disabled) {
-            background-color: #173a5b;
+          .auth-button:hover:not(:disabled) {
+            background-color: #1D4ED8;
           }
           
-          .register-button:disabled {
-            opacity: 0.6;
+          .auth-button:active:not(:disabled) {
+            transform: scale(0.98);
+          }
+          
+          .auth-button:disabled {
+            background-color: #E5E7EB;
+            color: #9CA3AF;
             cursor: not-allowed;
           }
           
-          .error-message {
-            color: #c50f1f;
-            font-size: 14px;
-            margin-bottom: 15px;
+          .auth-error {
+            background-color: #FEE2E2;
+            border: 1px solid #FCA5A5;
+            color: #DC2626;
+            font-size: 12.5px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            line-height: 1.4;
           }
           
-          .back-link {
+          .auth-switch-link {
             text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #6B7280;
           }
           
-          .back-link a {
-            color: #1f4d7a;
-            text-decoration: none;
+          .auth-switch-btn {
+            background: none;
+            border: none;
+            color: #2563EB;
             cursor: pointer;
             font-weight: 600;
+            padding: 0;
+            font-size: 13px;
+            font-family: inherit;
           }
           
-          .back-link a:hover {
+          .auth-switch-btn:hover {
+            color: #1D4ED8;
             text-decoration: underline;
           }
         `}
       </style>
       
       <div style={styles.box}>
-        <h1 style={styles.title}>OfficeBuddy</h1>
-        <h2 style={styles.subtitle}>Đăng ký tài khoản</h2>
+        <div style={styles.logoContainer}>
+          <div style={styles.logoIcon}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h1 style={styles.title}>OfficeBuddy</h1>
+        </div>
+        <p style={styles.subtitle}>Đăng ký tài khoản để bắt đầu sử dụng</p>
 
-        <form className="register-form" onSubmit={handleRegister}>
-          {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleRegister}>
+          {error && <div className="auth-error">⚠️ {error}</div>}
 
-          <div>
+          <div className="auth-input-group">
             <label style={styles.label}>Tên tài khoản</label>
             <input
-              className="register-input"
+              className="auth-input"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -197,10 +243,10 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin })
             />
           </div>
 
-          <div>
+          <div className="auth-input-group">
             <label style={styles.label}>Mật khẩu</label>
             <input
-              className="register-input"
+              className="auth-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -210,10 +256,10 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin })
             />
           </div>
 
-          <div>
+          <div className="auth-input-group">
             <label style={styles.label}>Xác nhận mật khẩu</label>
             <input
-              className="register-input"
+              className="auth-input"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -224,29 +270,31 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onBackToLogin })
           </div>
 
           <button
-            className="register-button"
+            className="auth-button"
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? "Đang đăng ký..." : "Đăng ký"}
+            {isLoading ? "Đang tạo tài khoản..." : "Đăng ký"}
           </button>
         </form>
 
-        <div className="back-link">
-          Đã có tài khoản? <button type="button" onClick={onBackToLogin} style={{background: "none", border: "none", color: "#1f4d7a", cursor: "pointer", fontWeight: "600", padding: "0", fontSize: "14px"}}>Đăng nhập</button>
+        <div className="auth-switch-link">
+          Đã có tài khoản?{" "}
+          <button type="button" className="auth-switch-btn" onClick={onBackToLogin}>
+            Đăng nhập
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
+/* ─── Login Component ──────────────────────────────────────── */
 interface LoginProps {
   onLoginSuccess: (user: any) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
-  console.log("Login component rendering");
-  
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
@@ -260,15 +308,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
     try {
       const credentials: LoginRequest = { username, password };
-      console.log("Attempting login with:", credentials);
       const response = await AuthService.login(credentials);
-      console.log("Login response:", response);
-
-      // Save tokens
       AuthService.saveTokens(response.data.accessToken, response.data.refreshToken);
-      console.log("Tokens saved, calling success callback");
-
-      // Call the success callback
       onLoginSuccess(response.data.user);
     } catch (err: any) {
       console.error("Login error:", err);
@@ -286,89 +327,120 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     <div style={styles.container}>
       <style>
         {`
-          @import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap");
+          @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
           
-          .login-form {
-            font-family: 'Source Sans 3', sans-serif;
+          .auth-input-group {
+            margin-bottom: 16px;
           }
           
-          .login-input {
+          .auth-input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 14px;
+            padding: 10px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            color: #111827;
+            background-color: #FCFCFC;
             box-sizing: border-box;
-          }
-          
-          .login-input:focus {
             outline: none;
-            border-color: #1f4d7a;
-            box-shadow: 0 0 0 2px rgba(31, 77, 122, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           }
           
-          .login-button {
+          .auth-input::placeholder {
+            color: #9CA3AF;
+          }
+          
+          .auth-input:focus {
+            border-color: #2563EB;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+          }
+          
+          .auth-button {
             width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background-color: #1f4d7a;
+            padding: 11px;
+            margin-top: 8px;
+            background-color: #2563EB;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 16px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           }
           
-          .login-button:hover:not(:disabled) {
-            background-color: #173a5b;
+          .auth-button:hover:not(:disabled) {
+            background-color: #1D4ED8;
           }
           
-          .login-button:disabled {
-            opacity: 0.6;
+          .auth-button:active:not(:disabled) {
+            transform: scale(0.98);
+          }
+          
+          .auth-button:disabled {
+            background-color: #E5E7EB;
+            color: #9CA3AF;
             cursor: not-allowed;
           }
           
-          .error-message {
-            color: #c50f1f;
-            font-size: 14px;
-            margin-bottom: 15px;
+          .auth-error {
+            background-color: #FEE2E2;
+            border: 1px solid #FCA5A5;
+            color: #DC2626;
+            font-size: 12.5px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            line-height: 1.4;
           }
           
-          .register-link {
+          .auth-switch-link {
             text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #6B7280;
           }
           
-          .register-link a {
-            color: #1f4d7a;
-            text-decoration: none;
+          .auth-switch-btn {
+            background: none;
+            border: none;
+            color: #2563EB;
             cursor: pointer;
             font-weight: 600;
+            padding: 0;
+            font-size: 13px;
+            font-family: inherit;
           }
           
-          .register-link a:hover {
+          .auth-switch-btn:hover {
+            color: #1D4ED8;
             text-decoration: underline;
           }
         `}
       </style>
       
       <div style={styles.box}>
-        <h1 style={styles.title}>OfficeBuddy</h1>
-        <h2 style={styles.subtitle}>Đăng nhập</h2>
+        <div style={styles.logoContainer}>
+          <div style={styles.logoIcon}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h1 style={styles.title}>OfficeBuddy</h1>
+        </div>
+        <p style={styles.subtitle}>Đăng nhập để kết nối tài khoản eOffice của bạn</p>
 
-        <form className="login-form" onSubmit={handleLogin}>
-          {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleLogin}>
+          {error && <div className="auth-error">⚠️ {error}</div>}
 
-          <div>
+          <div className="auth-input-group">
             <label style={styles.label}>Tên tài khoản</label>
             <input
-              className="login-input"
+              className="auth-input"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -378,10 +450,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             />
           </div>
 
-          <div>
+          <div className="auth-input-group">
             <label style={styles.label}>Mật khẩu</label>
             <input
-              className="login-input"
+              className="auth-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -392,21 +464,23 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </div>
 
           <button
-            className="login-button"
+            className="auth-button"
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+            {isLoading ? "Đang kết nối..." : "Đăng nhập"}
           </button>
         </form>
 
-        <div className="register-link">
-          Chưa có tài khoản? <button type="button" onClick={() => setShowRegister(true)} style={{background: "none", border: "none", color: "#1f4d7a", cursor: "pointer", fontWeight: "600", padding: "0", fontSize: "14px"}}>Đăng ký ngay</button>
+        <div className="auth-switch-link">
+          Chưa có tài khoản?{" "}
+          <button type="button" className="auth-switch-btn" onClick={() => setShowRegister(true)}>
+            Đăng ký ngay
+          </button>
         </div>
       </div>
     </div>
   );
 };
-
 
 export default Login;

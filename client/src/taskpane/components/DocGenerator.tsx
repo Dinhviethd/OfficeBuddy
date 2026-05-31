@@ -368,73 +368,83 @@ const DocGenerator: React.FC = () => {
     }
   };
 
-  /* ── Render ── */
   return (
     <div className="dg-root" ref={containerRef}>
       <style>{`
         /* ─── Root ──────────────────────────────────── */
         .dg-root {
-          --primary: #0078d4;
-          --primary-dark: #005a9e;
-          --bg: #f5f5f5;
+          --primary: #2563EB;
+          --primary-hover: #1D4ED8;
+          --primary-light: rgba(37, 99, 235, 0.06);
+          --bg: #FAFAFA;
           --card: #ffffff;
-          --border: #e0e0e0;
-          --text: #1b1b1b;
-          --muted: #6e6e6e;
-          --danger: #c50f1f;
-          --success: #107c10;
-          font-family: "Segoe UI", -apple-system, sans-serif;
+          --border: #E5E7EB;
+          --text: #111827;
+          --muted: #6B7280;
+          --danger: #EF4444;
+          --success: #10B981;
+          font-family: "Inter", -apple-system, sans-serif;
           color: var(--text);
-          font-size: 14px;
+          font-size: 13.5px;
           display: flex;
           flex-direction: column;
           height: 100%;
           overflow-y: auto;
+          box-sizing: border-box;
+          background: var(--bg);
         }
 
         /* ─── Section Title ─────────────────────────── */
         .dg-title {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 700;
-          color: var(--primary);
-          padding: 14px 16px 4px;
+          color: #111827;
+          padding: 16px 16px 4px;
           margin: 0;
+          letter-spacing: -0.015em;
         }
 
         /* ─── Mode Toggle ──────────────────────────── */
         .dg-toggle {
           display: flex;
-          margin: 10px 16px;
-          border-radius: 8px;
-          overflow: hidden;
+          margin: 12px 16px;
+          background: #F3F4F6;
+          padding: 3px;
+          border-radius: 10px;
           border: 1px solid var(--border);
         }
         .dg-toggle-btn {
           flex: 1;
-          padding: 9px 0;
-          font-size: 13px;
-          font-weight: 600;
+          padding: 7px 0;
+          font-size: 12.5px;
+          font-weight: 500;
           font-family: inherit;
           border: none;
+          border-radius: 8px;
           cursor: pointer;
-          transition: background .2s, color .2s;
-          background: var(--card);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          background: transparent;
           color: var(--muted);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .dg-toggle-btn.active {
-          background: var(--primary);
-          color: #fff;
+          background: var(--card);
+          color: var(--primary);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          font-weight: 600;
         }
         .dg-toggle-btn:not(.active):hover {
-          background: #e8f0fe;
+          color: var(--text);
         }
 
         /* ─── Form Container ───────────────────────── */
         .dg-form {
-          padding: 0 16px 12px;
+          padding: 4px 16px 12px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 14px;
         }
 
         /* ─── Select ───────────────────────────────── */
@@ -443,217 +453,254 @@ const DocGenerator: React.FC = () => {
           padding: 10px 12px;
           border: 1px solid var(--border);
           border-radius: 8px;
-          font-size: 14px;
+          font-size: 13.5px;
           font-family: inherit;
-          background: #fafafa;
+          color: var(--text);
+          background: var(--card);
           outline: none;
           cursor: pointer;
-          transition: border-color .2s;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
         .dg-select:focus {
           border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         /* ─── Field Group ──────────────────────────── */
         .dg-field {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 5px;
         }
         .dg-label {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text);
+          font-size: 12.5px;
+          font-weight: 500;
+          color: #374151;
         }
         .dg-input,
         .dg-textarea-field {
           width: 100%;
-          padding: 9px 12px;
+          padding: 10px 12px;
           border: 1px solid var(--border);
           border-radius: 8px;
-          font-size: 14px;
+          font-size: 13.5px;
           font-family: inherit;
-          background: #fafafa;
+          color: var(--text);
+          background: var(--card);
           outline: none;
-          transition: border-color .2s, box-shadow .2s;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           box-sizing: border-box;
         }
         .dg-input:focus,
         .dg-textarea-field:focus {
           border-color: var(--primary);
-          box-shadow: 0 0 0 2px rgba(0,120,212,.12);
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         .dg-textarea-field {
           resize: vertical;
-          min-height: 64px;
+          min-height: 68px;
           line-height: 1.5;
         }
 
         /* ─── Free Text Area ───────────────────────── */
         .dg-free-area {
-          padding: 0 16px 12px;
+          padding: 4px 16px 12px;
         }
         .dg-free-textarea {
           width: 100%;
-          min-height: 100px;
+          min-height: 120px;
           padding: 12px;
           border: 1px solid var(--border);
           border-radius: 8px;
-          font-size: 14px;
+          font-size: 13.5px;
           font-family: inherit;
-          background: #fafafa;
+          color: var(--text);
+          background: var(--card);
           outline: none;
           resize: vertical;
           line-height: 1.55;
           box-sizing: border-box;
-          transition: border-color .2s, box-shadow .2s;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .dg-free-textarea:focus {
           border-color: var(--primary);
-          box-shadow: 0 0 0 2px rgba(0,120,212,.12);
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         /* ─── Submit Button ────────────────────────── */
         .dg-submit {
-          margin: 0 16px 14px;
-          padding: 11px 0;
+          margin: 4px 16px 16px;
+          padding: 10px 0;
           background: var(--primary);
           color: #fff;
           border: none;
           border-radius: 8px;
-          font-size: 14px;
+          font-size: 13.5px;
           font-weight: 600;
           font-family: inherit;
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0,120,212,.2);
-          transition: background .2s, transform .15s;
+          box-shadow: 0 2px 6px rgba(37,99,235, 0.15);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .dg-submit:not(:disabled):hover {
-          background: var(--primary-dark);
-          transform: translateY(-1px);
+          background: var(--primary-hover);
+        }
+        .dg-submit:active:not(:disabled) {
+          transform: scale(0.98);
         }
         .dg-submit:disabled {
-          background: #bbb;
+          background: #E5E7EB;
+          color: #9CA3AF;
           cursor: not-allowed;
           box-shadow: none;
         }
 
         /* ─── Generating Indicator ─────────────────── */
         .dg-generating {
-          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
           padding: 20px 16px;
           color: var(--primary);
-          font-weight: 600;
-          animation: dg-blink 1.2s infinite;
+          font-weight: 500;
+          font-size: 13px;
         }
-        @keyframes dg-blink {
-          0%, 100% { opacity: 1; }
-          50%      { opacity: .4; }
+        
+        .dg-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(37, 99, 235, 0.15);
+          border-radius: 50%;
+          border-top-color: var(--primary);
+          animation: dg-spin 0.8s linear infinite;
+        }
+        
+        @keyframes dg-spin {
+          to { transform: rotate(360deg); }
         }
 
         /* ─── Error ────────────────────────────────── */
         .dg-error {
-          margin: 0 16px 10px;
+          margin: 4px 16px 12px;
           padding: 10px 14px;
-          background: #fde7e9;
-          color: var(--danger);
+          background: #FEE2E2;
+          border: 1px solid #FCA5A5;
+          color: #DC2626;
           border-radius: 8px;
-          font-size: 13px;
-          font-weight: 600;
+          font-size: 12.5px;
+          font-weight: 500;
+          line-height: 1.45;
         }
 
         /* ─── Success Banner ───────────────────────── */
         .dg-success-banner {
-          margin: 0 16px 10px;
+          margin: 4px 16px 12px;
           padding: 10px 14px;
-          background: #e6f4ea;
-          color: var(--success);
+          background: #ECFDF5;
+          border: 1px solid #A7F3D0;
+          color: #059669;
           border-radius: 8px;
-          font-size: 13px;
-          font-weight: 600;
+          font-size: 12.5px;
+          font-weight: 500;
+          line-height: 1.45;
         }
 
         /* ─── Result Area ──────────────────────────── */
         .dg-result-section {
-          margin: 0 16px 16px;
+          margin: 8px 16px 20px;
           border: 1px solid var(--border);
-          border-radius: 10px;
+          border-radius: 12px;
           overflow: hidden;
           background: var(--card);
-          box-shadow: 0 2px 12px rgba(0,0,0,.06);
+          box-shadow: 0 4px 20px rgba(0,0,0, 0.02);
         }
         .dg-result-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 10px 14px;
-          background: #f0f6fd;
+          background: #F9FAFB;
           border-bottom: 1px solid var(--border);
         }
         .dg-result-title {
-          font-size: 13px;
-          font-weight: 700;
-          color: var(--primary);
+          font-size: 12.5px;
+          font-weight: 600;
+          color: #374151;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
-        .dg-result-textarea {
-          width: 100%;
-          min-height: 200px;
-          padding: 14px;
-          border: none;
-          font-size: 14px;
-          font-family: inherit;
-          line-height: 1.6;
-          resize: vertical;
-          outline: none;
-          background: var(--card);
+        
+        /* Paper sheet look for Document Preview */
+        .dg-result-preview {
+          background: #ffffff !important;
+          border: 1px solid #E5E7EB !important;
+          border-radius: 8px !important;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.02) !important;
+          margin: 14px !important;
+          padding: 24px 20px !important;
           box-sizing: border-box;
+          outline: none;
         }
+        
         .dg-result-actions {
           display: flex;
           gap: 8px;
-          padding: 10px 14px;
+          padding: 12px 14px;
           border-top: 1px solid var(--border);
-          background: #fafafa;
+          background: #F9FAFB;
         }
         .dg-action-btn {
           flex: 1;
-          padding: 9px 0;
+          padding: 8px 0;
           border: none;
           border-radius: 6px;
-          font-size: 13px;
+          font-size: 12.5px;
           font-weight: 600;
           font-family: inherit;
           cursor: pointer;
-          transition: background .2s, transform .15s;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        .dg-action-btn:hover {
-          transform: translateY(-1px);
+        .dg-action-btn:active {
+          transform: scale(0.98);
         }
         .dg-btn-insert {
           background: var(--primary);
           color: #fff;
         }
         .dg-btn-insert:hover {
-          background: var(--primary-dark);
+          background: var(--primary-hover);
         }
         .dg-btn-insert.success {
           background: var(--success);
         }
         .dg-btn-copy {
-          background: #e8e8e8;
+          background: #F3F4F6;
+          border: 1px solid var(--border);
           color: var(--text);
         }
         .dg-btn-copy:hover {
-          background: #ddd;
+          background: #E5E7EB;
         }
         .dg-btn-copy.success {
           background: var(--success);
+          border-color: var(--success);
           color: #fff;
         }
       `}</style>
 
       {/* ── Title ── */}
-      <h2 className="dg-title">📝 Soạn thảo văn bản</h2>
+      <h2 className="dg-title">Soạn thảo văn bản AI</h2>
 
       {/* ── Mode Toggle ── */}
       <div className="dg-toggle">
@@ -662,24 +709,34 @@ const DocGenerator: React.FC = () => {
           onClick={() => setMode("form")}
           type="button"
         >
-          📋 Nhập theo form
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style={{marginRight: '5px'}}>
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="9" y1="9" x2="15" y2="9"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+            <line x1="9" y1="17" x2="13" y2="17"/>
+          </svg>
+          <span>Nhập theo form</span>
         </button>
         <button
           className={`dg-toggle-btn ${mode === "free" ? "active" : ""}`}
           onClick={() => setMode("free")}
           type="button"
         >
-          ✏️ Yêu cầu tự do
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style={{marginRight: '5px'}}>
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          <span>Yêu cầu tự do</span>
         </button>
       </div>
 
       {/* ── Error Banner (Top) ── */}
-      {error && <div className="dg-error">❌ {error}</div>}
+      {error && <div className="dg-error">⚠️ {error}</div>}
 
       {/* ── Success Banner (Top) ── */}
       {result && (
         <div className="dg-success-banner">
-          🎉 Đã tạo văn bản thành công và tự động chèn vào Word! Bạn có thể xem chi tiết hoặc sao chép ở phía dưới.
+          ✨ Đã tạo văn bản thành công và tự động chèn vào Word! Bạn có thể chỉnh sửa trực tiếp hoặc sao chép ở phía dưới.
         </div>
       )}
 
@@ -731,7 +788,19 @@ const DocGenerator: React.FC = () => {
             onClick={() => void handleSubmitForm()}
             disabled={isGenerating}
           >
-            {isGenerating ? "⏳ Đang soạn thảo..." : "🚀 Tạo văn bản"}
+            {isGenerating ? (
+              <>
+                <span className="dg-spinner" style={{marginRight: '8px'}} />
+                <span>Đang soạn thảo...</span>
+              </>
+            ) : (
+              <>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style={{marginRight: '6px'}}>
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <span>Tạo văn bản</span>
+              </>
+            )}
           </button>
         </>
       )}
@@ -754,21 +823,45 @@ const DocGenerator: React.FC = () => {
             onClick={() => void handleSubmitFree()}
             disabled={isGenerating || !freeText.trim()}
           >
-            {isGenerating ? "⏳ Đang soạn thảo..." : "🚀 Tạo văn bản"}
+            {isGenerating ? (
+              <>
+                <span className="dg-spinner" style={{marginRight: '8px'}} />
+                <span>Đang soạn thảo...</span>
+              </>
+            ) : (
+              <>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style={{marginRight: '6px'}}>
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <span>Tạo văn bản</span>
+              </>
+            )}
           </button>
         </>
       )}
 
       {/* ── Generating indicator ── */}
       {isGenerating && (
-        <div className="dg-generating">⏳ AI đang soạn thảo văn bản, vui lòng chờ...</div>
+        <div className="dg-generating">
+          <span className="dg-spinner" />
+          <span>Trí tuệ nhân tạo đang phác thảo văn bản, vui lòng đợi...</span>
+        </div>
       )}
 
       {/* ── Result ── */}
       {result && (
         <div className="dg-result-section" ref={resultSectionRef}>
           <div className="dg-result-header">
-            <span className="dg-result-title">📄 Kết quả</span>
+            <span className="dg-result-title">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <span>Xem trước văn bản (Bản nháp)</span>
+            </span>
           </div>
           <div
             ref={resultRef}
@@ -778,17 +871,17 @@ const DocGenerator: React.FC = () => {
             onInput={(e) => setResult(e.currentTarget.innerHTML)}
             dangerouslySetInnerHTML={{ __html: result }}
             style={{
-              width: "100%",
+              width: "calc(100% - 28px)",
               minHeight: "250px",
               maxHeight: "450px",
               overflowY: "auto",
-              padding: "16px",
+              padding: "24px 20px",
               border: "none",
               fontSize: "14px",
               fontFamily: "inherit",
               lineHeight: "1.6",
               outline: "none",
-              background: "var(--card)",
+              background: "#ffffff",
               boxSizing: "border-box"
             }}
           />
@@ -798,14 +891,33 @@ const DocGenerator: React.FC = () => {
               type="button"
               onClick={() => void handleInsertToWord()}
             >
-              {insertSuccess ? "✅ Đã chèn!" : "📥 Chèn vào Word"}
+              {insertSuccess ? (
+                <span>Đã chèn thành công!</span>
+              ) : (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style={{marginRight: '5px'}}>
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                  <span>Chèn lại vào Word</span>
+                </>
+              )}
             </button>
             <button
               className={`dg-action-btn dg-btn-copy ${copySuccess ? "success" : ""}`}
               type="button"
               onClick={() => void handleCopy()}
             >
-              {copySuccess ? "✅ Đã copy!" : "📋 Copy"}
+              {copySuccess ? (
+                <span>Đã copy!</span>
+              ) : (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style={{marginRight: '5px'}}>
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  <span>Copy văn bản</span>
+                </>
+              )}
             </button>
           </div>
         </div>
