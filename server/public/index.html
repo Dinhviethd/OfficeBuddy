@@ -733,7 +733,7 @@
     <div style="display: flex; align-items: center; gap: 14px;">
       <a href="/admin.html" id="adminHeaderBtn" class="admin-btn-header" style="display: none;">🛠️ Admin Panel</a>
       <div class="user-profile">
-        <span class="user-name" id="userNameHeader">Cán bộ: Nguyễn Văn A</span>
+        <span class="user-name" id="userNameHeader">Nguyễn Văn A</span>
         <div class="user-avatar" id="userAvatarHeader">CB</div>
       </div>
       <button class="logout-btn-header" onclick="handleLogoutHeader()">🚪 Đăng xuất</button>
@@ -944,7 +944,7 @@
         localStorage.setItem('role', user.role);
         localStorage.setItem('email', user.email);
 
-        document.getElementById('userNameHeader').textContent = `Cán bộ: ${user.fullName}`;
+        document.getElementById('userNameHeader').textContent = `${user.fullName}`;
         
         // Extract initials
         const parts = user.fullName.split(' ');
