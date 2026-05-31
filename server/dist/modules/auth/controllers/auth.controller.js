@@ -76,21 +76,6 @@ class AuthController {
         };
         res.status(200).json(response);
     });
-    getCurrentAvatar = (0, error_response_1.asyncHandler)(async (req, res) => {
-        const userId = req.user?.userId;
-        if (!userId) {
-            throw new error_response_1.AppError(401, 'Unauthorized');
-        }
-        const user = await auth_service_1.authService.getCurrentUser(userId);
-        const response = {
-            success: true,
-            message: 'Lấy ảnh đại diện thành công',
-            data: {
-                avatarUrl: user.avatarUrl,
-            },
-        };
-        res.status(200).json(response);
-    });
     updateCurrentProfile = (0, error_response_1.asyncHandler)(async (req, res) => {
         const userId = req.user?.userId;
         if (!userId) {
@@ -127,42 +112,6 @@ class AuthController {
         const response = {
             success: true,
             message: 'Đổi mật khẩu thành công',
-        };
-        res.status(200).json(response);
-    });
-    uploadAvatar = (0, error_response_1.asyncHandler)(async (req, res) => {
-        const userId = req.user?.userId;
-        if (!userId) {
-            throw new error_response_1.AppError(401, 'Unauthorized');
-        }
-        if (!req.file?.buffer) {
-            throw new error_response_1.AppError(400, 'Vui lòng chọn ảnh đại diện');
-        }
-        const user = await auth_service_1.authService.uploadAvatar(userId, req.file.buffer);
-        const response = {
-            success: true,
-            message: 'Cập nhật ảnh đại diện thành công',
-            data: user,
-        };
-        res.status(200).json(response);
-    });
-    updatePresetAvatar = (0, error_response_1.asyncHandler)(async (req, res) => {
-        const userId = req.user?.userId;
-        if (!userId) {
-            throw new error_response_1.AppError(401, 'Unauthorized');
-        }
-        const validationResult = auth_schema_1.updatePresetAvatarSchema.safeParse(req.body);
-        if (!validationResult.success) {
-            const errorMessage = validationResult.error.issues
-                .map((err) => err.message)
-                .join(', ');
-            throw new error_response_1.AppError(400, errorMessage);
-        }
-        const user = await auth_service_1.authService.updatePresetAvatar(userId, validationResult.data.avatarUrl);
-        const response = {
-            success: true,
-            message: 'Cập nhật avatar thành công',
-            data: user,
         };
         res.status(200).json(response);
     });

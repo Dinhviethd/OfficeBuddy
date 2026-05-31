@@ -7,12 +7,17 @@ exports.initDatabase = exports.AppDataSource = void 0;
 require("reflect-metadata");
 const typeorm_1 = require("typeorm");
 const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
-// Use SQLite for local development
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not defined in environment");
+}
 exports.AppDataSource = new typeorm_1.DataSource({
-    type: "sqlite",
-    database: path_1.default.resolve(__dirname, "../../data/database.sqlite"),
+    type: "postgres",
+    url: databaseUrl,
+    ssl: {
+        rejectUnauthorized: false,
+    },
     synchronize: true,
     logging: false,
     entities: [

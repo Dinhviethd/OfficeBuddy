@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - eOffice DUT</title>
+  <meta name="description" content="Hệ thống quản trị tài liệu và cấu hình RAG - eOffice DUT">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg-light: #fafafa;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+      --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── SIDEBAR ────────────────────────────────────────────── */
+    aside {
+      width: 280px;
+      background-color: #ffffff;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 32px 24px;
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 36px;
+      color: var(--primary);
+    }
+
+    .brand-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(37, 99, 235, 0.05);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      color: var(--primary);
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-item a:hover {
+      color: var(--text-main);
+      background-color: #f3f4f6;
+    }
+
+    .nav-item.active a {
+      color: var(--primary);
+      background-color: rgba(37, 99, 235, 0.05);
+      font-weight: 600;
+    }
+
+    .nav-item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+
+    .nav-item.active .nav-item-icon {
+      color: var(--primary);
+    }
+
+    .user-card {
+      background-color: #f9fafb;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 13.5px;
+    }
+
+    .user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      color: var(--text-main);
+    }
+
+    .user-role {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .logout-btn:hover {
+      background-color: #fef2f2;
+    }
+
+    /* ─── MAIN CONTENT AREA ──────────────────────────────────── */
+    main {
+      margin-left: 280px;
+      padding: 40px 48px;
+      flex: 1;
+      max-width: 1360px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .header-left h2 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .header-left p {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+    }
+
+    .quick-chat-link {
+      background-color: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 13.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .quick-chat-link:hover {
+      background-color: #f9fafb;
+      border-color: var(--text-muted);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-info h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-info p {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      background-color: rgba(37, 99, 235, 0.05);
+      color: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Content Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 28px;
+    }
+
+    /* Upload Zone Card */
+    .section-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+    }
+
+    .section-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropzone-container {
+      border: 2px dashed #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 36px 24px;
+      text-align: center;
+      background-color: #fafafa;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 20px;
+    }
+
+    .dropzone-container:hover, .dropzone-container.drag-over {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .dropzone-icon {
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dropzone-text h4 {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .dropzone-text p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      background-color: #ffffff;
+      transition: var(--transition);
+    }
+
+    .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    .upload-btn {
+      width: 100%;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upload-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .upload-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* List Table Card */
+    .file-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .file-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    .file-table th {
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    .file-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    .file-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .file-name-cell {
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-icon {
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .badge-folder {
+      background-color: #f3f4f6;
+      color: var(--text-secondary);
+    }
+
+    .badge-success {
+      background-color: var(--success-bg);
+      color: var(--success-color);
+    }
+
+    .action-btn-delete {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 6px;
+      border-radius: 4px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn-delete:hover {
+      background-color: #fef2f2;
+    }
+
+    /* Upload Log / Tasks Panel */
+    .log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .log-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background-color: #fafafa;
+      border: 1px solid var(--border-color);
+      font-size: 12.5px;
+    }
+
+    .log-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .log-text h5 {
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .log-text p {
+      color: var(--text-secondary);
+    }
+
+    .log-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Visual toast notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background-color: var(--text-main);
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(40px);
+      opacity: 0;
+      animation: toast-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes toast-fade-in {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Access Control Script -->
+  <script>
+    // Access checking before rendering body
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const fullName = localStorage.getItem('fullName');
+
+    if (!token || role !== 'admin') {
+      // Not logged in or not admin, redirect to login page
+      window.location.href = '/login.html';
+    }
+  </script>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside>
+    <div class="brand-section">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="brand-title">Admin eOffice</div>
+    </div>
+
+    <ul class="nav-list">
+      <li class="nav-item active">
+        <a href="#">
+          <span class="nav-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9"/>
+              <rect x="14" y="3" width="7" height="5"/>
+              <rect x="14" y="12" width="7" height="9"/>
+              <rect x="3" y="16" width="7" height="5"/>
+            </svg>
+          </span>
+          <span>Tổng quan & Upload</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/index.html">
+          <span class="nav-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </span>
+          <span>Chatbot Web Portal</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="user-card">
+      <div class="user-avatar" id="avatarName">AD</div>
+      <div class="user-info">
+        <div class="user-name" id="userNameLabel">Quản trị viên</div>
+        <div class="user-role">Quản trị hệ thống</div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()" title="Đăng xuất">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main>
+    <header>
+      <div class="header-left">
+        <h2>Tổng quan Hệ thống & Upload Tài liệu RAG</h2>
+        <p>Quản trị kho học liệu, quy định, biểu mẫu và đồng bộ Vector Database lên Supabase.</p>
+      </div>
+      <a href="/index.html" class="quick-chat-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Vào Chatbot AI</span>
+      </a>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Tổng số tài liệu</h4>
+          <p>42 văn bản</p>
+        </div>
+        <div class="stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Thư mục RAG</h4>
+          <p>9 danh mục</p>
+        </div>
+        <div class="stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Lượt chat (Hôm nay)</h4>
+          <p>128 yêu cầu</p>
+        </div>
+        <div class="stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Vector DB Status</h4>
+          <p>Đã đồng bộ</p>
+        </div>
+        <div class="stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Columns -->
+    <div class="content-grid">
+      <!-- Left Column: Upload & Files -->
+      <div>
+        <!-- Upload Form -->
+        <div class="section-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+            <span>Upload Tài liệu mới vào RAG</span>
+          </h3>
+          
+          <div class="form-group">
+            <label for="categoryInput" class="form-label">Danh mục tài liệu RAG (Cho phép nhập danh mục mới)</label>
+            <input type="text" id="categoryInput" class="form-select" style="text-align: left; background-color: #ffffff;" placeholder="Ví dụ: bieu-mau, thong-bao, quy-che-moi, danh-ba...">
+          </div>
+
+          <div class="form-group">
+            <label for="adminNameInput" class="form-label">Họ tên Admin thực hiện</label>
+            <input type="text" id="adminNameInput" class="form-select" style="text-align: left; background-color: #ffffff;" placeholder="Nhập tên của bạn...">
+          </div>
+
+          <div class="form-group">
+            <label for="fileDescriptionInput" class="form-label">Mô tả nội dung file (Bắt buộc để LLM phân biệt cũ/mới)</label>
+            <textarea id="fileDescriptionInput" class="form-select" style="text-align: left; height: 80px; resize: none; background-color: #ffffff;" placeholder="Ví dụ: Quy chế đào tạo cập nhật học kỳ hè 2026, bổ sung phụ lục xếp loại tốt nghiệp mới nhất..."></textarea>
+          </div>
+
+          <!-- Drag and drop zone -->
+          <div 
+            id="dropzone" 
+            class="dropzone-container"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            <div class="dropzone-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+              </svg>
+            </div>
+            <div class="dropzone-text">
+              <h4>Kéo và thả file của bạn vào đây hoặc click để duyệt file</h4>
+              <p>Chấp nhận file định dạng PDF, DOCX, XLSX, TXT. Dung lượng tối đa 10MB.</p>
+            </div>
+            <input type="file" id="fileInput" style="display: none" accept=".docx,.xlsx,.pdf,.txt" onchange="handleFileSelect(event)">
+          </div>
+
+          <div id="fileSelectedDisplay" style="display: none; margin-bottom: 20px; font-size: 13.5px; background-color: var(--primary-light); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(37, 99, 235, 0.15);">
+            📄 Đã chọn file: <strong id="selectedFileName">document.docx</strong> (<span id="selectedFileSize">0 KB</span>)
+          </div>
+
+          <!-- Result Area -->
+          <div id="resultArea" style="display: none; margin-bottom: 20px; font-size: 13.5px; padding: 14px; border-radius: var(--radius-sm); border: 1px solid;"></div>
+
+          <button id="uploadBtn" class="upload-btn" onclick="triggerRealUpload()">
+            <span>Bắt đầu upload & embedding RAG</span>
+          </button>
+        </div>
+
+        <!-- Files List -->
+        <div class="section-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"/>
+              <line x1="8" y1="12" x2="21" y2="12"/>
+              <line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6"/>
+              <line x1="3" y1="12" x2="3.01" y2="12"/>
+              <line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+            <span>Danh sách tài liệu RAG đã đồng bộ</span>
+          </h3>
+          <div class="file-table-wrapper">
+            <table class="file-table">
+              <thead>
+                <tr>
+                  <th>Tên văn bản</th>
+                  <th>Danh mục RAG</th>
+                  <th>Trạng thái Vector</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="fileTableBody">
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                      </span>
+                      <span>HD-thutuc-thanhtoan-congtacphi-2025.pdf</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Tài chính, kế toán</span></td>
+                  <td><span class="badge badge-success">Đã index (12 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'HD-thutuc-thanhtoan-congtacphi-2025.pdf')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                      </span>
+                      <span>Quy-dinh-xet-hoc-bong-KKHT-2025.docx</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Công tác sinh viên</span></td>
+                  <td><span class="badge badge-success">Đã index (8 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'Quy-dinh-xet-hoc-bong-KKHT-2025.docx')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                      </span>
+                      <span>QD-quyche-daotao-tinchi-DUT-K23.pdf</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Đào tạo</span></td>
+                  <td><span class="badge badge-success">Đã index (25 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'QD-quyche-daotao-tinchi-DUT-K23.pdf')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <span class="file-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                      </span>
+                      <span>Mau-to-trinh-xin-kinh-phi-khoa.docx</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-folder">Biểu mẫu</span></td>
+                  <td><span class="badge badge-success">Đã index (4 vectors)</span></td>
+                  <td>
+                    <button class="action-btn-delete" title="Xóa tài liệu khỏi RAG" onclick="deleteMockFile(this, 'Mau-to-trinh-xin-kinh-phi-khoa.docx')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Operations / Logs -->
+      <div>
+        <div class="section-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            <span>Tiến trình Xử lý RAG</span>
+          </h3>
+          <div class="log-list" id="logList">
+            <div class="log-item">
+              <div class="log-bullet"></div>
+              <div class="log-text">
+                <h5>Đồng bộ Vector Database hoàn tất</h5>
+                <p>Toàn bộ 42 văn bản đã được chunking và embedding lên database.</p>
+                <div class="log-time">10 phút trước</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-bullet"></div>
+              <div class="log-text">
+                <h5>Khởi tạo mô hình AI Gemini 2.5 thành công</h5>
+                <p>Đã thiết lập kết nối API Key và RAG retriever pipelines.</p>
+                <div class="log-time">30 phút trước</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-bullet" style="background-color: #eab308;"></div>
+              <div class="log-text">
+                <h5>Cấp tài khoản Admin mặc định</h5>
+                <p>Admin mặc định admin@dut.udn.vn đã hoạt động.</p>
+                <div class="log-time">1 giờ trước</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Cấu hình Mô hình RAG</span>
+          </h3>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+            Thiết lập các siêu tham số cho mô hình truy hồi thông tin và trả lời câu hỏi AI.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Mô hình AI sử dụng</label>
+            <select class="form-select" disabled>
+              <option>Gemini 2.5 Flash (Tối ưu RAG)</option>
+              <option>Gemini 2.5 Pro (Độ chính xác cao)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Chunk Size (Số ký tự/đoạn)</label>
+            <select class="form-select">
+              <option value="500">500 ký tự (Đoạn ngắn - chi tiết)</option>
+              <option value="1000" selected>1000 ký tự (Khuyên dùng)</option>
+              <option value="1500">1500 ký tự (Đoạn dài - đầy đủ ngữ cảnh)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Số đoạn văn truy hồi tối đa (K)</label>
+            <select class="form-select">
+              <option value="3">Top 3 đoạn tương đồng nhất</option>
+              <option value="5" selected>Top 5 đoạn tương đồng nhất (Khuyên dùng)</option>
+              <option value="8">Top 8 đoạn tương đồng nhất</option>
+            </select>
+          </div>
+
+          <button class="upload-btn" style="background-color: var(--text-main);" onclick="showToast('Cập nhật cấu hình mô hình AI thành công!')">
+            Lưu thiết lập cấu hình
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Toast -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    // Display logged in username
+    window.addEventListener('DOMContentLoaded', () => {
+      if (fullName) {
+        document.getElementById('userNameLabel').textContent = fullName;
+        
+        // Initials for avatar
+        const words = fullName.split(' ');
+        let initials = 'CB';
+        if (words.length > 0) {
+          initials = words[words.length - 1].substring(0, 2).toUpperCase();
+        }
+        document.getElementById('avatarName').textContent = initials;
+      }
+    });
+
+    // Toast message function
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      // Auto remove toast
+      setTimeout(() => {
+        toast.style.animation = 'none';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    // Handle logout action
+    function handleLogout() {
+      localStorage.clear();
+      showToast('Đang đăng xuất khỏi hệ thống...');
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 1000);
+    }
+
+    // Mock interactive upload
+    let selectedFile = null;
+    const dropzone = document.getElementById('dropzone');
+    const fileSelectedDisplay = document.getElementById('fileSelectedDisplay');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const selectedFileSize = document.getElementById('selectedFileSize');
+
+    // Drag-over styling
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('drag-over');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('drag-over');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      
+      if (e.dataTransfer.files.length > 0) {
+        setFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files.length > 0) {
+        setFile(e.target.files[0]);
+      }
+    }
+
+    function setFile(file) {
+      selectedFile = file;
+      selectedFileName.textContent = file.name;
+      selectedFileSize.textContent = `${Math.round(file.size / 1024)} KB`;
+      fileSelectedDisplay.style.display = 'block';
+      showToast(`Đã chọn file: ${file.name}`);
+    }
+
+    async function triggerRealUpload() {
+      if (!selectedFile) {
+        showResult('error', 'Vui lòng kéo/thả hoặc chọn tài liệu cần upload trước.');
+        return;
+      }
+
+      const category = document.getElementById('categoryInput').value.trim();
+      const uploadedBy = document.getElementById('adminNameInput').value.trim();
+      const fileDescription = document.getElementById('fileDescriptionInput').value.trim();
+
+      if (!category) {
+        showResult('error', 'Vui lòng nhập danh mục tài liệu RAG.');
+        return;
+      }
+      if (!uploadedBy) {
+        showResult('error', 'Vui lòng điền họ tên admin thực hiện.');
+        return;
+      }
+      if (!fileDescription) {
+        showResult('error', 'Vui lòng điền mô tả tài liệu (Bắt buộc để LLM phân biệt cũ/mới).');
+        return;
+      }
+
+      const btn = document.getElementById('uploadBtn');
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Đang tải file lên & phân tích trích xuất chữ...';
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('category', category);
+      formData.append('uploadedBy', uploadedBy);
+      formData.append('fileDescription', fileDescription);
+
+      try {
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Lỗi xử lý upload từ server.');
+        }
+
+        // Show successful message
+        showResult('success', `Đăng tải thành công! File đã được embedding và lập chỉ mục RAG. Chunks đã chèn: ${data.chunksInserted}`);
+
+        // Add dynamically to file table
+        const tableBody = document.getElementById('fileTableBody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td>
+            <div class="file-name-cell">
+              <span class="file-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </span>
+              <span>${selectedFile.name}</span>
+            </div>
+          </td>
+          <td><span class="badge badge-folder">${category}</span></td>
+          <td><span class="badge badge-success">Đã index (${data.chunksInserted} chunks)</span></td>
+          <td>
+            <button class="action-btn-delete" title="Xóa tài liệu" onclick="this.closest('tr').remove(); showToast('Đã gỡ bản ghi tạm thời');">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            </button>
+          </td>
+        `;
+        tableBody.insertBefore(newRow, tableBody.firstChild);
+
+        // Add dynamically to activity log
+        const logList = document.getElementById('logList');
+        const newLog = document.createElement('div');
+        newLog.className = 'log-item';
+        newLog.innerHTML = `
+          <div class="log-bullet"></div>
+          <div class="log-text">
+            <h5>Đã nạp văn bản "${selectedFile.name}" thành công</h5>
+            <p>Admin: ${uploadedBy}. Chunks: ${data.chunksInserted}. Mô tả: ${fileDescription}</p>
+            <div class="log-time">Vừa xong</div>
+          </div>
+        `;
+        logList.insertBefore(newLog, logList.firstChild);
+
+        showToast(`✅ Đã nạp thành công tài liệu RAG: ${selectedFile.name}`);
+
+        // Reset file inputs
+        selectedFile = null;
+        document.getElementById('fileInput').value = '';
+        document.getElementById('fileSelectedDisplay').style.display = 'none';
+        document.getElementById('fileDescriptionInput').value = '';
+
+      } catch (err) {
+        console.error('Real upload error:', err);
+        showResult('error', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Bắt đầu upload & embedding RAG</span>';
+      }
+    }
+
+    function showResult(type, message) {
+      const resultArea = document.getElementById('resultArea');
+      resultArea.style.display = 'block';
+      if (type === 'success') {
+        resultArea.style.backgroundColor = 'var(--success-bg)';
+        resultArea.style.borderColor = 'var(--success-border)';
+        resultArea.style.color = 'var(--success-color)';
+        resultArea.innerHTML = `✓ <strong>Thành công:</strong> ${message}`;
+      } else {
+        resultArea.style.backgroundColor = 'var(--error-bg)';
+        resultArea.style.borderColor = 'var(--error-border)';
+        resultArea.style.color = 'var(--error-color)';
+        resultArea.innerHTML = `✕ <strong>Lỗi:</strong> ${message}`;
+      }
+    }
+
+    function deleteMockFile(btn, name) {
+      if (confirm(`Bạn có chắc chắn muốn xóa tài liệu RAG "${name}"? Thao tác này sẽ xóa toàn bộ vectors liên quan trong database.`)) {
+        btn.closest('tr').remove();
+        showToast(`🗑 Đã gỡ bỏ tài liệu khỏi RAG: ${name}`);
+
+        // Add to log
+        const logList = document.getElementById('logList');
+        const newLog = document.createElement('div');
+        newLog.className = 'log-item';
+        newLog.innerHTML = `
+          <div class="log-bullet" style="background-color: var(--error-color);"></div>
+          <div class="log-text">
+            <h5>Đã gỡ bỏ văn bản "${name}"</h5>
+            <p>Toàn bộ embeddings của tài liệu đã bị xóa khỏi cơ sở dữ liệu Vector.</p>
+            <div class="log-time">Vừa xong</div>
+          </div>
+        `;
+        logList.insertBefore(newLog, logList.firstChild);
+      }
+    }
+  </script>
+</body>
+</html>

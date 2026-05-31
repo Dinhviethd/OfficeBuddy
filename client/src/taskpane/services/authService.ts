@@ -18,12 +18,9 @@ export interface AuthResponse {
   data: {
     user: {
       idUser: string;
-      name: string;
       username: string;
-      email?: string;
-      phone?: string;
-      avatarUrl?: string;
-      emailVerified: boolean;
+      createdAt: string;
+      updatedAt: string;
     };
     accessToken: string;
     refreshToken: string;

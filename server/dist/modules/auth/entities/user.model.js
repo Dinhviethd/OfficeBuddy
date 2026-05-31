@@ -11,21 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
-const role_model_1 = require("./role.model");
 let User = class User {
     idUser;
-    name;
     username;
-    email;
     password;
-    emailVerified;
-    avatarUrl;
-    phone;
     resetOTP;
     resetOTPExpires;
     createdAt;
     updatedAt;
-    role;
 };
 exports.User = User;
 __decorate([
@@ -33,33 +26,13 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "idUser", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "name", void 0);
-__decorate([
     (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true, nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ default: false }),
-    __metadata("design:type", Boolean)
-], User.prototype, "emailVerified", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "avatarUrl", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "phone", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
@@ -76,11 +49,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({ name: "updated_at" }),
     __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => role_model_1.Role, role => role.users),
-    (0, typeorm_1.JoinColumn)({ name: 'roleId' }),
-    __metadata("design:type", role_model_1.Role)
-], User.prototype, "role", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

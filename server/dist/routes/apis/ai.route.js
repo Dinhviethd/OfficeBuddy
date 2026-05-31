@@ -8,4 +8,8 @@ const router = (0, express_1.Router)();
 router.post("/chat", rateLimiter_middleware_1.chatRateLimiter, (req, res, next) => {
     ai_controller_1.aiController.chat(req, res, next);
 });
+// Endpoint để generate tài liệu
+router.post("/generate-document", rateLimiter_middleware_1.chatRateLimiter, (req, res, next) => {
+    ai_controller_1.aiController.generateDocument(req, res, next);
+});
 exports.default = router;

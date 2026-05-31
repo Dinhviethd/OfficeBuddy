@@ -8,17 +8,17 @@ import cors from 'cors'
 import { createServer } from 'http'
 import cookieParser from 'cookie-parser'
 import path from 'path'
-import jwt from 'jsonwebtoken'
 import router from './routes/index'
 import { initDatabase } from '@/configs/database.config'
 import errorHandler from "@/middlewares/errorHandlermiddleware";
+import aiRouter from "@/modules/ai/ai.route";
 
 const app = express()
 const server = createServer(app)
 
-// Static files serving (if needed for deployment)
-// const clientBuildPath = path.resolve('/app/public');
-// app.use(express.static(clientBuildPath));
+// Phục vụ thư mục tĩnh public chứa Web Portal
+const publicPath = path.join(process.cwd(), 'public');
+app.use(express.static(publicPath));
 
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }))
@@ -31,18 +31,10 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
-// TODO: Database initialization disabled for now
-// To enable: Install SQLite3 (npm install sqlite3) or configure PostgreSQL connection
-// See database.config.ts for configuration
-// initDatabase().catch(err => {
-//     console.error("Failed to connect to database!");
-//     console.error(err);
-//     process.exit(1);
-// });
-
 app.use("/api", router)
+app.use("/api/ai", aiRouter);
 
-app.get("/", (req, res) => {
+app.get("/api-status", (req, res) => {
     res.json({ 
         success: true, 
         message: "eOffice API Server is running",
@@ -60,7 +52,16 @@ app.use(errorHandler.errorHandler)
 
 const PORT = process.env.PORT || 8000
 
+const bootstrap = async () => {
+    await initDatabase();
 
-server.listen(PORT, () => {
-    console.log(`Server run at http://localhost:${PORT}`)
-})
+    server.listen(PORT, () => {
+        console.log(`Server run at http://localhost:${PORT}`)
+    })
+}
+
+bootstrap().catch(err => {
+    console.error("Failed to start server!");
+    console.error(err);
+    process.exit(1);
+});
